@@ -3,84 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚨 마피아 수사 통제 센터 (교사용)</title>
+    <title>🚨 명탐정 코난: 마피아 수사 통제 센터 (교사용)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #06080a; color: #e2e8f0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #090f17; color: #e2e8f0; }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
     </style>
 </head>
 <body class="min-h-screen p-6 flex flex-col items-center">
 
     <div class="w-full max-w-6xl space-y-6">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex justify-between items-center shadow-2xl">
+        <!-- 상단 헤더 배너: 코난 수사 본부 감성 -->
+        <div class="bg-[#101b2b] border-2 border-[#b8860b]/40 rounded-2xl p-6 flex justify-between items-center shadow-2xl">
             <div>
-                <h1 class="text-3xl font-black text-cyan-400 font-orbitron tracking-widest">MAFIA SYSTEM: CONTROL PANEL</h1>
-                <p class="text-xs text-gray-400 mt-1">※ 교사 화면에는 학생들의 실제 역할(마피아/경찰)이 절대 표시되지 않습니다.</p>
+                <h1 class="text-3xl font-black text-[#e0a96d] font-orbitron tracking-widest drop-shadow-[0_0_10px_rgba(224,169,109,0.3)]">CRIMINAL INVESTIGATION HQ</h1>
+                <p class="text-xs text-gray-400 mt-1">※ 교사 통제 패널에는 보안 유지 상 학생들의 실제 정체(마피아/경찰)가 노출되지 않습니다.</p>
             </div>
-            <div class="bg-gray-950 px-6 py-3 rounded-xl border border-gray-800 text-right">
-                <span class="text-xs text-cyan-500 block font-semibold tracking-wider">REMAINING TIME</span>
+            <div class="bg-[#05090f] px-6 py-3 rounded-xl border border-[#223956] text-right">
+                <span class="text-xs text-[#e0a96d] block font-black tracking-wider">LIMIT TIMELINE</span>
                 <span id="display-timer" class="text-3xl font-bold font-orbitron text-white">05:00</span>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
-                <h2 class="text-lg font-bold text-white flex items-center">⚙️ 클래스 설정</h2>
+            <!-- 1. 클래스 설정 패널 -->
+            <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-5 space-y-4 shadow-xl">
+                <h2 class="text-lg font-bold text-[#e0a96d] flex items-center">⚙️ 수사망 정보 설정</h2>
                 <div class="space-y-3 text-sm">
                     <div>
-                        <label class="block text-gray-400 text-xs mb-1">참가 학생 이름 입력 (공백/쉼표 구분)</label>
-                        <textarea id="input-students" class="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-cyan-500" placeholder="예시: 김철수, 이영희, 박민수"></textarea>
+                        <label class="block text-gray-400 text-xs mb-1">용의선상 학생 이름 기입 (공백/쉼표 구분)</label>
+                        <textarea id="input-students" class="w-full h-32 bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]" placeholder="예시: 남도일, 유미란, 하인성, 정보라"></textarea>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-gray-400 text-xs mb-1">마피아 (위조범)</label>
-                            <input type="number" id="count-mafia" value="1" min="1" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-white">
+                            <input type="number" id="count-mafia" value="1" min="1" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white font-bold text-center">
                         </div>
                         <div>
                             <label class="block text-gray-400 text-xs mb-1">경찰 (수사관)</label>
-                            <input type="number" id="count-police" value="1" min="0" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-white">
+                            <input type="number" id="count-police" value="1" min="0" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white font-bold text-center">
                         </div>
                     </div>
-                    <button onclick="generateGameData()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-lg transition-all text-xs cursor-pointer">🎲 역할 및 랜덤 단서 생성</button>
+                    <button onclick="generateGameData()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-bold py-3 rounded-xl transition-all text-xs cursor-pointer shadow-md">🎲 사건 유포 및 역할 동기화</button>
                 </div>
 
-                <div class="border-t border-gray-800 pt-3 space-y-2">
-                    <button onclick="startTimer()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 rounded-lg text-xs cursor-pointer">⏱️ 낮 토론 타이머 시작</button>
-                    <button onclick="extractAllSuspects()" class="w-full bg-red-950/80 hover:bg-red-900 text-red-400 font-bold py-2 rounded-lg text-xs border border-red-900/50 cursor-pointer">🔨 전체 용의자 명단 법정 기소</button>
+                <div class="border-t border-[#223956] pt-3 space-y-2">
+                    <button onclick="startTimer()" class="w-full bg-[#1b2b42] hover:bg-[#223956] text-[#e0a96d] font-bold py-2.5 rounded-xl text-xs border border-[#e0a96d]/20 cursor-pointer">⏱️ 실시간 추리 타이머 구동</button>
+                    <button onclick="extractAllSuspects()" class="w-full bg-red-950/40 hover:bg-red-900/60 text-red-400 font-bold py-2.5 rounded-xl text-xs border border-red-900/40 cursor-pointer">🔨 의심 용의자 전원 법정 기소</button>
                 </div>
             </div>
 
-            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col lg:col-span-2">
-                <h2 class="text-lg font-bold text-white mb-4 flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-red-500 mr-2 animate-ping"></span> [활동 2] 실시간 고발 투표 상황판
+            <!-- 2. 실시간 투표 정산 상황판 (TV 배치용) -->
+            <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-5 flex flex-col lg:col-span-2 shadow-xl">
+                <h2 class="text-lg font-bold text-[#e0a96d] mb-4 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-red-600 mr-2 animate-ping"></span> Realtime: 용의선상 실시간 고발 저울 그래프
                 </h2>
                 <div id="chart-container" class="space-y-4 flex-1 overflow-y-auto max-h-[380px] pr-2">
-                    <p class="text-sm text-gray-500 italic text-center py-12">게임 데이터 생성 후 학생들이 투표를 시작하면 실시간으로 반영됩니다.</p>
+                    <p class="text-sm text-gray-500 italic text-center py-12">클래스 수사망 가동 후 학생들이 단서를 제출하기 시작하면 실시간 데이터 전송 정산이 시작됩니다.</p>
                 </div>
             </div>
         </div>
 
-        <div id="court-panel" class="bg-gray-900 border-2 border-red-900/50 rounded-2xl p-6 hidden space-y-6">
+        <!-- 3. 야간 즉결 재판 패널 -->
+        <div id="court-panel" class="bg-[#101b2b] border-2 border-red-900/50 rounded-2xl p-6 hidden space-y-6 shadow-2xl">
             <div class="text-center">
-                <span class="bg-red-950 text-red-400 text-xs font-bold px-3 py-1 rounded-full border border-red-900/40 font-orbitron">NIGHT COURT</span>
-                <h3 class="text-2xl font-black text-white mt-2">⚖️ 용의자 개별 즉결 재판 실시간 저울 현황</h3>
-                <p class="text-xs text-gray-400 mt-1">학생들이 각 용의자별로 처형/살리기를 선택한 결과가 개별 집계됩니다.</p>
+                <span class="bg-red-950 text-red-400 text-xs font-black px-4 py-1.5 rounded-full border border-red-900/40 font-orbitron">NIGHT COURT SYSTEM</span>
+                <h3 class="text-2xl font-black text-white mt-3">⚖️ 피의 기소자 배심원 투표 실시간 집계 현황</h3>
+                <p class="text-xs text-gray-400 mt-1">학생들 기기 화면에 나타난 용의자 처형/구출 판결 표수가 클라우드로 실시간 반영 중입니다.</p>
             </div>
 
-            <div id="court-scales-container" class="space-y-6 max-w-3xl mx-auto"></div>
+            <div id="court-scales-container" class="space-y-4 max-w-3xl mx-auto"></div>
 
             <div class="flex justify-center pt-2">
-                <button onclick="closeCourt()" class="bg-red-700 hover:bg-red-600 text-white font-bold px-8 py-3 rounded-xl text-xs cursor-pointer shadow-lg">재판 결과 최종 확정 및 판결 선포</button>
+                <button onclick="closeCourt()" class="bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-bold px-8 py-3..5 rounded-xl text-xs cursor-pointer shadow-lg">재판 결과 최종 선포 및 징계 봉쇄</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 선생님의 실제 파이어베이스 서버 주소 연동 완료!
+        // 🔥 선생님 전용 서버 주소 유지
         const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -166,7 +170,7 @@
                 globalTimer: "05:00",
                 signal: "INIT"
             });
-            alert(`전체 학생 기기 서버 동기화 완료! 이제 QR코드로 로그인 가능합니다.`);
+            alert(`수사망 가동 완료! 이제 학생 기기에서 접속이 승인됩니다.`);
         }
 
         function startTimer() {
@@ -208,20 +212,20 @@
             list.forEach(s => {
                 const pct = (s.votedCount / max) * 100;
                 let statusBadge = s.isAlive 
-                    ? `<span class="text-emerald-400 font-bold text-[11px] bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/30">🟢 생존</span>` 
-                    : `<span class="text-red-500 font-bold text-[11px] bg-red-950/40 px-2 py-0.5 rounded border border-red-900/30 line-through">💀 사망</span>`;
+                    ? `<span class="text-emerald-400 font-bold text-[11px] bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/30">🟢 추리 추적 중</span>` 
+                    : `<span class="text-red-500 font-bold text-[11px] bg-red-950/40 px-2 py-0.5 rounded border border-red-900/30 line-through">💀 CASE OUT (탈락)</span>`;
 
                 container.innerHTML += `
-                    <div class="space-y-1 bg-gray-950/40 p-2.5 rounded-xl border border-gray-800/40">
+                    <div class="space-y-1 bg-[#05090f]/60 p-3 rounded-xl border border-[#223956]/40">
                         <div class="flex justify-between items-center text-xs font-bold">
                             <div class="flex items-center space-x-2">
-                                <span class="text-gray-200 text-sm">${s.name}</span>
+                                <span class="text-gray-200 text-sm font-black">${s.name}</span>
                                 ${statusBadge}
                             </div>
-                            <span class="text-red-400 font-orbitron text-sm">${s.votedCount} 표</span>
+                            <span class="text-red-400 font-orbitron text-sm">${s.votedCount} 개의 의심 패킷</span>
                         </div>
-                        <div class="w-full bg-gray-950 h-2.5 rounded-full overflow-hidden border border-gray-800">
-                            <div class="bg-gradient-to-r from-red-600 to-orange-500 h-full" style="width: ${s.isAlive ? pct : 0}%"></div>
+                        <div class="w-full bg-[#05090f] h-3 rounded-full overflow-hidden border border-[#223956]">
+                            <div class="bg-gradient-to-r from-red-600 to-[#e0a96d] h-full" style="width: ${s.isAlive ? pct : 0}%"></div>
                         </div>
                     </div>`;
             });
@@ -230,7 +234,7 @@
         function extractAllSuspects() {
             recalculateVotedCounts();
             const list = Object.values(gameState.students).filter(s => s.isAlive && s.votedCount > 0);
-            if(list.length === 0) { alert("집계된 고발 투표 데이터가 없습니다."); return; }
+            if(list.length === 0) { alert("제출된 알리바이 수사 기록 패킷이 전무합니다."); return; }
             
             currentSuspectList = list.map(s => s.name);
             let initCourtVotes = {};
@@ -254,17 +258,17 @@
                 const savePct = (data.save / total) * 100;
 
                 container.innerHTML += `
-                    <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+                    <div class="bg-[#05090f]/80 p-4 rounded-xl border border-[#223956] space-y-2">
                         <div class="flex justify-between items-center">
-                            <span class="text-white font-bold text-base">👤 용의자: <span class="text-red-400 underline">${name}</span></span>
-                            <div class="flex space-x-4 text-xs font-semibold">
-                                <span class="text-red-500">💥 처형: ${data.execute}명</span>
-                                <span class="text-emerald-500">🌿 살리기: ${data.save}명</span>
+                            <span class="text-white font-bold text-base">👤 용의 기소자: <span class="text-red-400 underline font-black">${name}</span></span>
+                            <div class="flex space-x-4 text-xs font-bold">
+                                <span class="text-red-500">💥 처형 의견: ${data.execute}표</span>
+                                <span class="text-[#e0a96d]">🌿 면죄 의견: ${data.save}표</span>
                             </div>
                         </div>
-                        <div class="w-full h-4 bg-gray-900 rounded-full overflow-hidden flex border border-gray-800">
-                            <div class="bg-gradient-to-r from-red-600 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
-                            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
+                        <div class="w-full h-5 bg-slate-950 rounded-full overflow-hidden flex border border-[#223956]">
+                            <div class="bg-gradient-to-r from-red-700 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
+                            <div class="bg-gradient-to-r from-[#1b2b42] to-[#223956]" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
                         </div>
                     </div>`;
             });
@@ -290,9 +294,9 @@
             db.ref('courtStatus').set({ active: false, suspect: "" });
             db.ref('signal').set('RESET_ROUND');
 
-            let msg = "⚖️ [ 즉결 재판 최종 판결 결과 공포 ]\n\n";
-            if(killedList.length > 0) msg += `💀 처형(탈락): ${killedList.join(', ')}\n`;
-            if(savedList.length > 0) msg += `🌿 면죄(생존): ${savedList.join(', ')}\n`;
+            let msg = "⚖️ [ 즉결 재판 최종 판결 결과 선포 ]\n\n";
+            if(killedList.length > 0) msg += `💀 CASE OUT (추방): ${killedList.join(', ')}\n`;
+            if(savedList.length > 0) msg += `🌿 SURVIVED (생존): ${savedList.join(', ')}\n`;
             alert(msg);
         }
     </script>
