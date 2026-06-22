@@ -13,12 +13,12 @@
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
         .suspect-target-glow {
             border-color: #ef4444 !important;
-            background-color: rgba(239, 68, 68, 0.1) !important;
-            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
             animation: pulse-border 2s infinite;
         }
         @keyframes pulse-border {
-            0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
+            0%, 100’% { border-color: rgba(239, 68, 68, 0.5); }
             50% { border-color: rgba(239, 68, 68, 1); }
         }
     </style>
@@ -106,9 +106,13 @@
         let currentSuspectList = [];
         let timerInterval = null;
 
-        // 🔥 image_63c73a.png 특유의 하단까지 꽉 차는 묵직한 중절모 정장 상반신 실루엣 패스 구현
-        const svgCriminalSilhouette = `<svg viewBox="0 0 100 100" class="w-full h-full text-[#03060a] bg-[#0c1520] rounded-xl" fill="currentColor">
-            <path d="M 50 15 C 38 15 35 24 33 34 C 23 35 15 37 5 42 C 10 44 20 44 32 44 C 31 49 30 55 35 63 C 25 66 18 70 12 76 C 18 78 22 72 32 70 C 31 78 35 83 50 83 C 65 83 69 78 68 70 C 78 72 82 78 88 76 C 82 70 75 66 65 63 C 70 55 69 49 68 44 C 80 44 90 44 95 42 C 85 37 77 35 67 34 C 65 24 62 15 50 15 Z M 15 48 C 22 48 28 46 32 44 C 33 50 36 58 40 64 C 30 67 20 72 15 78 C 12 75 13 60 15 48 Z M 85 48 C 87 60 88 75 85 78 C 80 72 70 67 60 64 C 64 58 67 50 68 44 C 72 46 78 48 85 48 Z M 35 66 C 42 68 45 74 50 80 C 55 74 58 68 65 66 C 63 74 58 84 50 88 C 42 84 37 74 35 66 Z M 12 82 C 25 84 38 85 50 85 C 62 85 75 84 88 82 C 92 89 95 96 95 100 H 5 H 5 Z"/>
+        // 🔥 [완전 리뉴얼] 보내주신 이미지 양식과 1:1 일치하는 꽉 찬 명탐정 회색 상반신 실루엣 데이터
+        const svgCriminalSilhouette = `<svg viewBox="0 0 100 100" class="w-full h-full text-[#64748b] bg-[#05090f]" fill="currentColor">
+            <path d="M 50 12 C 40 12 36 21 34 32 C 20 33 10 35 2 40 C 8 42 18 42 30 42 C 29 47 28 53 33 61 C 23 64 16 68 10 74 C 16 76 20 70 30 68 C 29 76 33 81 48 81 C 63 81 67 76 66 68 C 76 70 80 76 86 74 C 80 68 73 64 63 61 C 68 53 67 47 66 42 C 78 42 88 44 94 40 C 86 35 76 33 66 32 C 64 21 60 12 50 12 Z"/>
+            <path d="M 12 45 C 19 45 25 43 29 41 C 30 47 33 55 37 61 C 27 64 17 69 12 75 C 9 72 10 57 12 45 Z"/>
+            <path d="M 84 45 C 86 57 87 72 84 75 C 79 69 69 64 59 61 C 63 55 66 47 67 41 C 71 43 77 45 84 45 Z"/>
+            <path d="M 32 63 C 39 65 42 71 47 77 C 52 71 55 65 62 63 C 60 71 55 81 47 85 C 39 81 34 71 32 63 Z"/>
+            <path d="M 2 80 C 15 82 35 83 48 83 C 61 83 81 82 94 80 C 94 88 94 95 94 100 H 2 Z"/>
         </svg>`;
 
         db.ref('students').on('value', (snapshot) => {
@@ -263,17 +267,14 @@
                     ? `<span class="text-emerald-400 font-extrabold text-[11px] bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">🟢 생존</span>` 
                     : `<span class="text-red-500 font-extrabold text-[11px] bg-red-950/60 px-2 py-0.5 rounded border border-red-900 line-through">💀 탈락</span>`;
 
-                // 🔥 캐릭터 프레임 자체를 여백 없이 꽉 채우는 대형 실루엣 카드 레이아웃 완성
                 container.innerHTML += `
                     <div class="bg-[#111c2e] border-2 border-[#223956]/80 rounded-2xl flex flex-col justify-between min-h-[260px] shadow-lg relative overflow-hidden transition-all ${hasVotes ? 'suspect-target-glow' : ''}">
                         <div class="absolute top-2 left-2 z-20">${statusBadge}</div>
                         
-                        <!-- 상반신 카드 꽉 채우기 영역 -->
-                        <div class="w-full flex-1 flex items-end justify-center bg-[#090e15] overflow-hidden p-0">
+                        <div class="w-full flex-1 flex items-end justify-center bg-[#05090f] overflow-hidden p-0">
                             ${svgCriminalSilhouette}
                         </div>
                         
-                        <!-- 이름 및 득표 상태 영역 -->
                         <div class="w-full border-t-2 border-[#223956] bg-[#111c2e] p-3 text-center space-y-1 z-10">
                             <span class="text-white text-xl font-black block">${s.name}</span>
                             <span class="font-orbitron text-base font-black ${hasVotes ? 'text-red-500' : 'text-gray-400'} block">
