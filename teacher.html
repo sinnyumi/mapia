@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 마피아 수사 통제 센터 (교사용)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;800&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #06080a; color: #e2e8f0; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen p-6 flex flex-col items-center">
+
+    <div class="w-full max-w-6xl space-y-6">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 flex justify-between items-center shadow-2xl">
+            <div>
+                <h1 class="text-3xl font-black text-cyan-400 font-orbitron tracking-widest">MAFIA SYSTEM: CONTROL PANEL</h1>
+                <p class="text-xs text-gray-400 mt-1">※ 교사 화면에는 학생들의 실제 역할(마피아/경찰)이 절대 표시되지 않습니다.</p>
+            </div>
+            <div class="bg-gray-950 px-6 py-3 rounded-xl border border-gray-800 text-right">
+                <span class="text-xs text-cyan-500 block font-semibold tracking-wider">REMAINING TIME</span>
+                <span id="display-timer" class="text-3xl font-bold font-orbitron text-white">05:00</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+                <h2 class="text-lg font-bold text-white flex items-center">⚙️ 클래스 설정</h2>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <label class="block text-gray-400 text-xs mb-1">참가 학생 이름 입력 (공백/쉼표 구분)</label>
+                        <textarea id="input-students" class="w-full h-32 bg-gray-950 border border-gray-800 rounded-lg p-2 text-white text-xs focus:outline-none focus:border-cyan-500" placeholder="예시: 김철수, 이영희, 박민수"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1">마피아 (위조범)</label>
+                            <input type="number" id="count-mafia" value="1" min="1" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-xs mb-1">경찰 (수사관)</label>
+                            <input type="number" id="count-police" value="1" min="0" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2 text-white">
+                        </div>
+                    </div>
+                    <button onclick="generateGameData()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2.5 rounded-lg transition-all text-xs cursor-pointer">🎲 역할 및 랜덤 단서 생성</button>
+                </div>
+
+                <div class="border-t border-gray-800 pt-3 space-y-2">
+                    <button onclick="startTimer()" class="w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 rounded-lg text-xs cursor-pointer">⏱️ 낮 토론 타이머 시작</button>
+                    <button onclick="extractAllSuspects()" class="w-full bg-red-950/80 hover:bg-red-900 text-red-400 font-bold py-2 rounded-lg text-xs border border-red-900/50 cursor-pointer">🔨 전체 용의자 명단 법정 기소</button>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl p-5 flex flex-col lg:col-span-2">
+                <h2 class="text-lg font-bold text-white mb-4 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-red-500 mr-2 animate-ping"></span> [활동 2] 실시간 고발 투표 상황판
+                </h2>
+                <div id="chart-container" class="space-y-4 flex-1 overflow-y-auto max-h-[380px] pr-2">
+                    <p class="text-sm text-gray-500 italic text-center py-12">게임 데이터 생성 후 학생들이 투표를 시작하면 실시간으로 반영됩니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="court-panel" class="bg-gray-900 border-2 border-red-900/50 rounded-2xl p-6 hidden space-y-6">
+            <div class="text-center">
+                <span class="bg-red-950 text-red-400 text-xs font-bold px-3 py-1 rounded-full border border-red-900/40 font-orbitron">NIGHT COURT</span>
+                <h3 class="text-2xl font-black text-white mt-2">⚖️ 용의자 개별 즉결 재판 실시간 저울 현황</h3>
+                <p class="text-xs text-gray-400 mt-1">학생들이 각 용의자별로 처형/살리기를 선택한 결과가 개별 집계됩니다.</p>
+            </div>
+
+            <div id="court-scales-container" class="space-y-6 max-w-3xl mx-auto"></div>
+
+            <div class="flex justify-center pt-2">
+                <button onclick="closeCourt()" class="bg-red-700 hover:bg-red-600 text-white font-bold px-8 py-3 rounded-xl text-xs cursor-pointer shadow-lg">재판 결과 최종 확정 및 판결 선포</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bc = new BroadcastChannel('mafia_classroom_channel');
+        let gameState = { students: {}, timerInterval: null };
+        
+        // ⭐ 중복 방지의 핵심: 학생별 최신 투표 상태를 저장하는 맵 구조화
+        // 구조: { 보낸학생이름: [지목한용의자1, 지목한용의자2] }
+        let rawVotesRegistry = {}; 
+
+        let courtVotesData = {}; 
+        let currentSuspectList = [];
+
+        localStorage.removeItem('mafia_students_data');
+        localStorage.removeItem('mafia_court_status');
+        localStorage.removeItem('mafia_votes_registry');
+
+        function generateGameData() {
+            const raw = document.getElementById('input-students').value;
+            const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
+            const mafiaCnt = parseInt(document.getElementById('count-mafia').value) || 1;
+            const policeCnt = parseInt(document.getElementById('count-police').value) || 1;
+
+            if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
+
+            let shuffled = [...names].sort(() => Math.random() - 0.5);
+            const grades = ["1", "2", "3"];
+            const hobbies = ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"];
+            const skills = ["축구", "탁구", "농구"];
+            const jobs = [
+                { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
+                { cn: "医生", py: "yīshēng", ko: "의사" },
+                { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
+                { cn: "作家", py: "zuòjiā", ko: "작가" }
+            ];
+
+            gameState.students = {};
+            rawVotesRegistry = {}; // 초기화
+            
+            shuffled.forEach((name, idx) => {
+                let role = "시민";
+                if(idx < mafiaCnt) role = "마피아";
+                else if(idx < mafiaCnt + policeCnt) role = "경찰";
+
+                let profile = {
+                    grade: grades[Math.floor(Math.random() * grades.length)],
+                    hobby: hobbies[Math.floor(Math.random() * hobbies.length)],
+                    skill: skills[Math.floor(Math.random() * skills.length)],
+                    job: jobs[Math.floor(Math.random() * jobs.length)]
+                };
+
+                gameState.students[name] = { name, role, isAlive: true, profile, votedCount: 0 };
+            });
+
+            localStorage.setItem('mafia_students_data', JSON.stringify(gameState.students));
+            bc.postMessage({ type: 'INIT_GAME', data: gameState.students });
+            
+            renderChart();
+            alert(`게임 데이터 분배 및 동기화 완료!`);
+        }
+
+        function startTimer() {
+            let sec = 300;
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                sec--;
+                if(sec <= 0) clearInterval(gameState.timerInterval);
+                const m = String(Math.floor(sec / 60)).padStart(2, '0');
+                const s = String(sec % 60).padStart(2, '0');
+                document.getElementById('display-timer').innerText = `${m}:${s}`;
+            }, 1000);
+            bc.postMessage({ type: 'START_TIMER' });
+        }
+
+        // ⭐ 변경 점: 누적 연산이 아니라 실시간 투표 저장소를 토대로 매번 깨끗하게 재계산 렌더링
+        function recalculateVotedCounts() {
+            // 1) 모든 학생의 투표 카운트를 일단 0으로 롤백
+            Object.keys(gameState.students).forEach(name => {
+                gameState.students[name].votedCount = 0;
+            });
+
+            // 2) 레지스트리에 기록된 각 학생의 '가장 최신 투표 데이터'만 합산
+            Object.values(rawVotesRegistry).forEach(votesArray => {
+                votesArray.forEach(suspectName => {
+                    if (gameState.students[suspectName]) {
+                        gameState.students[suspectName].votedCount++;
+                    }
+                });
+            });
+        }
+
+        function renderChart() {
+            recalculateVotedCounts(); // 차트를 그리기 직전에 덮어쓰기 데이터 기반 완벽 리셋 정산
+            
+            const container = document.getElementById('chart-container');
+            container.innerHTML = "";
+            const list = Object.values(gameState.students);
+            if(list.length === 0) return;
+
+            list.sort((a,b) => b.votedCount - a.votedCount);
+            const max = Math.max(...list.map(s => s.votedCount), 1);
+
+            list.forEach(s => {
+                const pct = (s.votedCount / max) * 100;
+                let statusBadge = s.isAlive 
+                    ? `<span class="text-emerald-400 font-bold text-[11px] bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/30">🟢 생존</span>` 
+                    : `<span class="text-red-500 font-bold text-[11px] bg-red-950/40 px-2 py-0.5 rounded border border-red-900/30 line-through">💀 사망</span>`;
+
+                container.innerHTML += `
+                    <div class="space-y-1 bg-gray-950/40 p-2.5 rounded-xl border border-gray-800/40">
+                        <div class="flex justify-between items-center text-xs font-bold">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-gray-200 text-sm">${s.name}</span>
+                                ${statusBadge}
+                            </div>
+                            <span class="text-red-400 font-orbitron text-sm">${s.votedCount} 표</span>
+                        </div>
+                        <div class="w-full bg-gray-950 h-2.5 rounded-full overflow-hidden border border-gray-800">
+                            <div class="bg-gradient-to-r from-red-600 to-orange-500 h-full" style="width: ${s.isAlive ? pct : 0}%"></div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function extractAllSuspects() {
+            recalculateVotedCounts();
+            const list = Object.values(gameState.students).filter(s => s.isAlive && s.votedCount > 0);
+            if(list.length === 0) { alert("집계된 고발 투표 데이터가 없습니다."); return; }
+            
+            currentSuspectList = list.map(s => s.name);
+            courtVotesData = {};
+            
+            currentSuspectList.forEach(name => {
+                courtVotesData[name] = { execute: 0, save: 0 };
+            });
+
+            renderCourtScales();
+            document.getElementById('court-panel').classList.remove('hidden');
+
+            const suspectString = currentSuspectList.join(', ');
+            localStorage.setItem('mafia_court_status', JSON.stringify({ active: true, suspect: suspectString }));
+            bc.postMessage({ type: 'START_COURT', suspect: suspectString });
+        }
+
+        function renderCourtScales() {
+            const container = document.getElementById('court-scales-container');
+            container.innerHTML = "";
+
+            currentSuspectList.forEach(name => {
+                const data = courtVotesData[name];
+                const total = data.execute + data.save || 1;
+                const exePct = (data.execute / total) * 100;
+                const savePct = (data.save / total) * 100;
+
+                container.innerHTML += `
+                    <div class="bg-gray-950/60 p-4 rounded-xl border border-gray-800 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-white font-bold text-base">👤 용의자: <span class="text-red-400 underline">${name}</span></span>
+                            <div class="flex space-x-4 text-xs font-semibold">
+                                <span class="text-red-500">💥 처형: ${data.execute}명</span>
+                                <span class="text-emerald-500">🌿 살리기: ${data.save}명</span>
+                            </div>
+                        </div>
+                        <div class="w-full h-4 bg-gray-900 rounded-full overflow-hidden flex border border-gray-800">
+                            <div class="bg-gradient-to-r from-red-600 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
+                            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function closeCourt() {
+            let killedList = [];
+            let savedList = [];
+
+            currentSuspectList.forEach(name => {
+                const data = courtVotesData[name];
+                if(data.execute >= data.save) {
+                    gameState.students[name].isAlive = false;
+                    killedList.push(name);
+                    bc.postMessage({ type: 'KILL_STUDENT', target: name });
+                } else {
+                    savedList.push(name);
+                    bc.postMessage({ type: 'FREE_STUDENT', target: name });
+                }
+            });
+
+            let msg = "⚖️ [ 즉결 재판 최종 판결 결과 공포 ]\n\n";
+            if(killedList.length > 0) msg += `💀 처형(탈락): ${killedList.join(', ')}\n`;
+            if(savedList.length > 0) msg += `🌿 면죄(생존): ${savedList.join(', ')}\n`;
+            alert(msg);
+
+            // 라운드 종료 시 투표 기록 완전 청소 (다음 라운드 중복 차단)
+            rawVotesRegistry = {}; 
+            Object.keys(gameState.students).forEach(k => { gameState.students[k].votedCount = 0; });
+            
+            localStorage.setItem('mafia_students_data', JSON.stringify(gameState.students));
+            localStorage.removeItem('mafia_court_status');
+            
+            currentSuspectList = [];
+            courtVotesData = {};
+            
+            bc.postMessage({ type: 'RESET_ROUND_SHEETS' });
+            document.getElementById('court-panel').classList.add('hidden');
+            renderChart();
+        }
+
+        bc.onmessage = (e) => {
+            if(e.data.type === 'SUBMIT_VOTE') {
+                // ⭐ 핵심 패치: e.data가 발송한 학생이름(voter)을 키값으로 삼아 최신 배열로 상시 덮어쓰기(Overwrite) 처리
+                // 구조: e.data = { voter: '홍길동', votes: ['이영희', '김철수'] }
+                const voterName = e.data.voter;
+                rawVotesRegistry[voterName] = e.data.votes; 
+                
+                renderChart(); // 리정산 차트 그리기
+            }
+            if(e.data.type === 'CAST_COURT_INDIVIDUAL') {
+                const { suspectName, choice } = e.data;
+                if(courtVotesData[suspectName]) {
+                    if(choice === 'execute') courtVotesData[suspectName].execute++;
+                    if(choice === 'save') courtVotesData[suspectName].save++;
+                    renderCourtScales();
+                }
+            }
+        };
+    </script>
+</body>
+</html>
