@@ -2,10 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🕵️‍♂️ 명탐정 코난: 클래스 마피아 수사 수첩</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Pretendard:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Pretendard:wght@700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -28,7 +28,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-3 flex flex-col items-center justify-start max-w-md mx-auto">
+<body class="min-h-screen p-3 flex flex-col items-center justify-start max-w-md mx-auto select-none">
 
     <div id="timer-bar" class="w-full bg-[#1b2b42]/95 border-2 border-[#b8860b]/40 rounded-2xl p-4 mb-4 flex justify-between items-center hidden shadow-2xl">
         <div class="flex items-center space-x-2.5">
@@ -38,9 +38,9 @@
         <span id="global-timer" class="font-orbitron text-2xl font-black text-[#e0a96d] drop-shadow-[0_0_8px_rgba(224,169,109,0.5)]">05:00</span>
     </div>
 
-    <div class="w-full space-y-4">
+    <div class="w-full space-y-4 flex-1 flex flex-col justify-center">
         <!-- 1단계: 로그인 -->
-        <div id="step-login" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-6 text-center space-y-6 shadow-2xl">
+        <div id="step-login" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-6 text-center space-y-6 shadow-2xl w-full">
             <div class="space-y-2">
                 <div class="text-3xl">🕵️‍♂️</div>
                 <h1 class="text-2xl font-black font-orbitron text-[#e0a96d] tracking-widest">DETECTIVE MAFIA</h1>
@@ -52,19 +52,26 @@
             </div>
         </div>
 
-        <!-- 2단계: 스캔 패드 -->
-        <div id="step-scanner" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-6 hidden flex flex-col items-center space-y-6 min-h-[400px] justify-center shadow-2xl">
-            <div class="text-center space-y-2">
+        <!-- 2단계: 모바일 화면을 꽉 채우는 지문인식 스캐너 패드 -->
+        <div id="step-scanner" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-4 hidden flex-1 flex flex-col items-center justify-between min-h-[80vh] shadow-2xl w-full">
+            <div class="text-center pt-2">
                 <h2 class="text-xl font-black text-[#e0a96d] font-orbitron tracking-wider">TARGET TRACKING</h2>
-                <p class="text-xs text-[#adbac7] font-medium">생체 데이터 확인을 위해 지문 원형 패드를 <br><span class="text-red-400 font-bold underline">3초간 꾹 누르고 계십시오.</span></p>
+                <p class="text-xs text-[#adbac7]">정체 식별을 위해 지문 모양을 <span class="text-red-400 font-bold underline">3초간 꾹 누르세요.</span></p>
             </div>
-            <div id="touch-zone" class="relative w-40 h-40 bg-[#090e15] border-4 border-[#e0a96d]/50 rounded-full flex items-center justify-center cursor-pointer select-none active:scale-95 transition-all overflow-hidden shadow-2xl">
-                <div id="laser" class="absolute left-0 w-full h-1 bg-[#e0a96d] shadow-[0_0_15px_#e0a96d] hidden scanner-line"></div>
-                <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-[#e0a96d]/20 transition-all duration-75" style="height: 0%;"></div>
-                <svg class="w-24 h-20 text-[#e0a96d] opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M12 11c0-.797.15-1.558.422-2.253m0 0A7.993 7.993 0 0120 12V14m-8-3a1 1 0 00-1-1H7m4 1v4m0 0v1a3 3 0 01-3 3H6a3 3 0 01-3-3V11.5c0-3.038 2.462-5.5 5.5-5.5 1.517 0 2.894.614 3.903 1.61M12 11h.01M21 14a3 3 0 01-3 3h-1a3 3 0 01-3-3v-1m6 1v3.5M12 21h.01M12 3h.01M12 17h.01"></path></svg>
+            
+            <!-- 🔥 화면 가득 차는 대형 리얼 지문 아이콘 패드 개조 -->
+            <div id="touch-zone" class="relative w-full flex-1 max-h-[55vh] bg-[#05090f] border-2 border-[#e0a96d]/30 rounded-2xl flex items-center justify-center cursor-pointer select-none overflow-hidden my-4 active:border-[#e0a96d]">
+                <div id="laser" class="absolute left-0 w-full h-1.5 bg-[#e0a96d] shadow-[0_0_20px_#e0a96d] hidden scanner-line z-10"></div>
+                <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-[#e0a96d]/15 transition-all duration-75" style="height: 0%;"></div>
+                
+                <!-- 대형 리얼 지문 형상 SVG 백그라운드 매칭 -->
+                <svg class="w-56 h-64 text-[#e0a96d] opacity-50 transition-opacity active:opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A1.5,1.5 0 0,1 13.5,5.5A1.5,1.5 0 0,1 12,7A1.5,1.5 0 0,1 10.5,5.5A1.5,1.5 0 0,1 12,4M12,18A6,6 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5A1.5,1.5 0 0,1 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A1.5,1.5 0 0,1 16.5,10.5A1.5,1.5 0 0,1 18,12A6,6 0 0,1 12,18M12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14M12,8A4,4 0 0,1 16,12A1.5,1.5 0 0,1 14.5,13.5A1.5,1.5 0 0,1 13,12A1.5,1.5 0 0,0 11.5,10.5A1.5,1.5 0 0,0 10,12A1.5,1.5 0 0,1 8.5,13.5A1.5,1.5 0 0,1 7,12A4,4 0 0,1 12,8Z"/>
+                </svg>
             </div>
-            <div class="h-6 flex items-center justify-center">
-                <p id="scan-status" class="text-sm font-bold text-[#adbac7]">대기 중...</p>
+            
+            <div class="pb-2">
+                <p id="scan-status" class="text-sm font-black text-[#adbac7]">지문 판독 센서 대기 중...</p>
             </div>
         </div>
 
@@ -74,11 +81,12 @@
             <h2 class="text-2xl font-black text-white tracking-widest animate-pulse">사건 파일 매칭 중...</h2>
         </div>
 
-        <!-- 4단계: 정체 최초 확인 창 -->
+        <!-- 4단계: 정체 최초 확인 창 (초대형 텍스트 크기 강화 패치) -->
         <div id="step-reveal" class="bg-[#101b2b] border-2 border-red-900/50 rounded-3xl p-5 hidden space-y-5 shadow-2xl">
-            <div class="text-center space-y-1">
-                <h2 id="role-title" class="text-xl font-black px-6 py-3 rounded-xl inline-block font-orbitron shadow-md">🚨 프로필 로드 완료</h2>
-                <p class="text-xs text-red-400 font-bold animate-pulse">⚠️ 주의: 주변 사람이 절대 보지 못하게 하십시오!</p>
+            <div class="text-center space-y-2">
+                <!-- 🔥 역할 텍스트(경찰, 마피아 등) 크기를 극대화함 -->
+                <h2 id="role-title" class="text-3xl font-black px-6 py-4 rounded-2xl inline-block font-orbitron tracking-wide shadow-2xl border-2">🚨 프로필 로드</h2>
+                <p class="text-sm text-red-500 font-black animate-pulse">⚠️ 주의: 역할이 노출되지 않게 한 손으로 가리세요!</p>
             </div>
             
             <div class="bg-[#090e15] border border-[#223956] rounded-xl p-4 space-y-2.5 shadow-inner">
@@ -91,7 +99,7 @@
                 </div>
             </div>
             <p id="role-tip" class="text-xs text-[#f0f6fc] bg-[#1b2b42] p-3.5 rounded-xl border border-[#223956] leading-relaxed font-semibold shadow-sm"></p>
-            <button onclick="goInvestigation()" class="w-full bg-gradient-to-r from-[#e0a96d] to-[#b8860b] text-slate-900 font-black py-4 rounded-2xl text-base shadow-lg cursor-pointer">🕶️ 정체 확인 완료 (비밀 수사 메모장 진입)</button>
+            <button onclick="goInvestigation()" class="w-full bg-gradient-to-r from-[#e0a96d] to-[#b8860b] text-slate-900 font-black py-4 rounded-2xl text-base shadow-lg cursor-pointer">🕶️ 정체 확인 완료 (화면 감추기)</button>
         </div>
 
         <!-- 5단계: 모달형 세로 수사 기록지 -->
@@ -141,7 +149,7 @@
             </p>
             <div class="grid grid-cols-2 gap-2.5 pt-0.5">
                 <button onclick="handleIndividualJudgement('execute')" class="bg-gradient-to-b from-red-800 to-red-600 text-white font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg">💥 처형 (処刑)</button>
-                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-gradient to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救출)</button>
+                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救출)</button>
             </div>
         </div>
     </div>
@@ -164,8 +172,6 @@
         let scanProgress = 0, scanInterval = null;
         let courtSuspectsQueue = []; 
         let currentQueueIndex = 0;
-
-        // 🔥 교사가 뿌려준 원격 단서 Pool 저장소 (초기값 설정)
         let cluesPool = { grade: [], hobby: [], skill: [], job: [] };
 
         db.ref('students').on('value', (snapshot) => {
@@ -179,7 +185,6 @@
             }
         });
 
-        // 🔥 교사창에서 세팅한 커스텀 단서 목록을 실시간 수신
         db.ref('cluesPool').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) cluesPool = data;
@@ -196,6 +201,10 @@
             if(sig === 'RESET_ROUND') {
                 document.getElementById('modal-court').classList.add('hidden');
                 rebuildInterviewSheet();
+            }
+            if(sig === 'RESET_ALL') {
+                // 원격 강제 로그아웃 리셋 처리
+                location.reload();
             }
         });
 
@@ -218,12 +227,15 @@
         function bindScannerEvents() {
             const zone = document.getElementById('touch-zone');
             zone.onmousedown = startScan; zone.onmouseup = stopScan; zone.onmouseleave = stopScan;
-            zone.ontouchstart = (e) => { e.preventDefault(); startScan(); }; zone.ontouchend = stopScan;
+            
+            // 모바일 터치이벤트 대응
+            zone.ontouchstart = (e) => { e.preventDefault(); startScan(); }; 
+            zone.ontouchend = (e) => { e.preventDefault(); stopScan(); };
         }
 
         function startScan() {
             document.getElementById('laser').classList.remove('hidden');
-            document.getElementById('scan-status').innerText = "알리바이 코드 분석 중...";
+            document.getElementById('scan-status').innerText = "알리바이 데이터 코드 스캔 중...";
             document.getElementById('scan-status').className = "text-xs font-black text-[#e0a96d] animate-pulse";
             scanInterval = setInterval(() => {
                 scanProgress += 5; document.getElementById('progress-bar').style.height = `${scanProgress}%`;
@@ -236,7 +248,7 @@
                 clearInterval(scanInterval); scanProgress = 0;
                 document.getElementById('progress-bar').style.height = `0%`;
                 document.getElementById('laser').classList.add('hidden');
-                document.getElementById('scan-status').innerText = "스캔 중단! 지문을 유지하세요.";
+                document.getElementById('scan-status').innerText = "스캔 실패! 화면 중앙 지문을 꾹 유지하세요.";
                 document.getElementById('scan-status').className = "text-xs font-bold text-red-500 animate-bounce";
             }
         }
@@ -248,7 +260,7 @@
                 document.getElementById('step-buildup').classList.add('hidden');
                 document.getElementById('step-reveal').classList.remove('hidden');
                 
-                document.querySelectorAll('.reveal-grade').forEach(el => el.innerText = myData.profile.grade.includes("학년") ? myData.profile.grade : `${myData.profile.grade}학년`);
+                document.querySelectorAll('.reveal-grade').forEach(el => el.innerText = myData.profile.grade);
                 document.querySelectorAll('.reveal-hobby').forEach(el => el.innerText = myData.profile.hobby);
                 document.querySelectorAll('.reveal-skill').forEach(el => el.innerText = myData.profile.skill);
                 document.querySelectorAll('.reveal-job').forEach(el => el.innerHTML = `${myData.profile.job.ko} <br><span class="text-[#e0a96d] font-bold font-mono text-[10px]">[${myData.profile.job.cn} / ${myData.profile.job.py}]</span>`);
@@ -256,14 +268,19 @@
                 const title = document.getElementById('role-title');
                 const tip = document.getElementById('role-tip');
 
+                // 🔥 [역할 표시 폰트 초대형 강화 패치]
                 if(myData.role === "마피아") {
-                    title.innerText = "🔍 당신은 마피아입니다.";
-                    title.className = "text-lg font-black bg-gradient-to-r from-red-950 to-red-900 text-red-400 border border-red-500/40 px-5 py-2 rounded-xl";
+                    title.innerText = "🚨 당신은 마피아입니다";
+                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-red-950 to-red-950 text-red-500 border-4 border-red-600 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
                     tip.innerHTML = "교실을 탐색하며 소통할 때, 당신의 수사 파일 정보 중 <strong class='text-red-400 underline'>딱 1개만 위조(거짓말)</strong>하여 대답해야 합니다. 다른 명탐정 수사관들의 추리를 기만하세요!";
+                } else if(myData.role === "경찰") {
+                    title.innerText = "⚡ 당신은 경찰입니다";
+                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-cyan-950 to-cyan-950 text-cyan-400 border-4 border-cyan-500 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-cyan-400'>100% 진실만을 답변</strong>해야 합니다. 동료 시민수사관들과 협력해 가짜 알리바이를 유포하는 스파이를 잡으세요.";
                 } else {
-                    title.innerText = myData.role === "경찰" ? "⚡ 당신은 경찰입니다." : "👥 당신은 시민입니다.";
-                    title.className = "text-lg font-black bg-gradient-to-r from-slate-800 to-slate-900 text-[#e0a96d] border border-[#e0a96d]/40 px-5 py-2 rounded-xl";
-                    tip.innerHTML = "당신은 무조건 <strong class='text-[#e0a96d]'>100% 진실만을 답변</strong>해야 합니다. 가짜 알리바이를 유포하고 다니는 범인을 찾아내세요.";
+                    title.innerText = "👥 당신은 시민입니다";
+                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-950 to-emerald-950 text-emerald-400 border-4 border-emerald-500 px-6 py-4 rounded-2xl shadow-2xl";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-emerald-400'>100% 진실만을 답변</strong>해야 합니다. 대화 릴레이를 통해 가짜 알리바이를 유포하고 다니는 범인을 찾아내세요.";
                 }
             }, 2000);
         }
@@ -292,9 +309,7 @@
                     else studentOpts += `<option value="${k}" disabled class="text-red-500/30 line-through">${k} [❌ 탈락]</option>`;
                 }
             });
-            
-            // 🔥 교사창에서 실시간 수신된 단서 목록으로 select 태그 렌더링
-            const renderOptions = (arr) => arr.map(v => `<option value="${v}">${v}</option>`).join('');
+            const renderOptions = (arr) => arr ? arr.map(v => `<option value="${v}">${v}</option>`).join('') : '';
             
             const card = document.createElement('div');
             card.className = "bg-[#090e15] border border-[#223956] rounded-xl p-3 space-y-2 text-xs shadow-md";
