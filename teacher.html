@@ -16,7 +16,7 @@
 <body class="min-h-screen p-6 flex flex-col items-center">
 
     <div class="w-full max-w-6xl space-y-6">
-        <!-- 상단 헤더 배너: 코난 수사 본부 감성 -->
+        <!-- 상단 헤더 배너 -->
         <div class="bg-[#101b2b] border-2 border-[#b8860b]/40 rounded-2xl p-6 flex justify-between items-center shadow-2xl">
             <div>
                 <h1 class="text-3xl font-black text-[#e0a96d] font-orbitron tracking-widest drop-shadow-[0_0_10px_rgba(224,169,109,0.3)]">CRIMINAL INVESTIGATION HQ</h1>
@@ -29,14 +29,15 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- 1. 클래스 설정 패널 -->
-            <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-5 space-y-4 shadow-xl">
+            <!-- 1. 클래스 및 단서 설정 패널 -->
+            <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-5 space-y-4 shadow-xl overflow-y-auto max-h-[80vh]">
                 <h2 class="text-lg font-bold text-[#e0a96d] flex items-center">⚙️ 수사망 정보 설정</h2>
                 <div class="space-y-3 text-sm">
                     <div>
-                        <label class="block text-gray-400 text-xs mb-1">용의선상 학생 이름 기입 (공백/쉼표 구분)</label>
-                        <textarea id="input-students" class="w-full h-32 bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]" placeholder="예시: 남도일, 유미란, 하인성, 정보라"></textarea>
+                        <label class="block text-gray-400 text-xs mb-1 font-bold">👤 용의선상 학생 이름 기입 (공백/쉼표 구분)</label>
+                        <textarea id="input-students" class="w-full h-24 bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]" placeholder="남도일, 유미란, 하인성, 정보라"></textarea>
                     </div>
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-gray-400 text-xs mb-1">마피아 (위조범)</label>
@@ -47,6 +48,28 @@
                             <input type="number" id="count-police" value="1" min="0" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white font-bold text-center">
                         </div>
                     </div>
+
+                    <!-- 🔥 교사가 커스텀 세팅하는 단서 입력 상자 섹션 -->
+                    <div class="border-t border-[#223956] pt-3 space-y-2.5">
+                        <span class="text-xs font-black text-[#e0a96d] block">📋 게임용 랜덤 단서 Pool 커스텀 세팅</span>
+                        <div>
+                            <label class="block text-gray-400 text-[11px] mb-0.5">1. 학년 목록 (쉼표 구분)</label>
+                            <input type="text" id="clue-grades" value="1학년, 2학년, 3학년" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-[11px] mb-0.5">2. 취미 목록 (쉼표 구분)</label>
+                            <input type="text" id="clue-hobbies" value="요리하기, 노래부르기, 영상찍기, 영화보기, 음악듣기" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-[11px] mb-0.5">3. 희망 능력 목록 (쉼표 구분)</label>
+                            <input type="text" id="clue-skills" value="축구, 탁구, 농구" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs focus:outline-none focus:border-[#e0a96d]">
+                        </div>
+                        <div>
+                            <label class="block text-gray-400 text-[11px] mb-0.5">4. 장래희망 한자 콤보 세팅 (줄바꿈 구분 / 한국어:한자:병음 형식)</label>
+                            <textarea id="clue-jobs" class="w-full h-24 bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-[11px] focus:outline-none focus:border-[#e0a96d] leading-tight">운동선수:运动选手:yùndòng xuǎnshǒu&#10;의사:医生:yīshēng&#10;인플루언서:网络红人:wǎngluò hóngrén&#10;작가:作家:zuòjiā</textarea>
+                        </div>
+                    </div>
+
                     <button onclick="generateGameData()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-bold py-3 rounded-xl transition-all text-xs cursor-pointer shadow-md">🎲 사건 유포 및 역할 동기화</button>
                 </div>
 
@@ -56,12 +79,12 @@
                 </div>
             </div>
 
-            <!-- 2. 실시간 투표 정산 상황판 (TV 배치용) -->
+            <!-- 2. 실시간 투표 정산 상황판 -->
             <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-5 flex flex-col lg:col-span-2 shadow-xl">
                 <h2 class="text-lg font-bold text-[#e0a96d] mb-4 flex items-center">
                     <span class="w-2 h-2 rounded-full bg-red-600 mr-2 animate-ping"></span> Realtime: 용의선상 실시간 고발 저울 그래프
                 </h2>
-                <div id="chart-container" class="space-y-4 flex-1 overflow-y-auto max-h-[380px] pr-2">
+                <div id="chart-container" class="space-y-4 flex-1 overflow-y-auto max-h-[500px] pr-2">
                     <p class="text-sm text-gray-500 italic text-center py-12">클래스 수사망 가동 후 학생들이 단서를 제출하기 시작하면 실시간 데이터 전송 정산이 시작됩니다.</p>
                 </div>
             </div>
@@ -74,17 +97,14 @@
                 <h3 class="text-2xl font-black text-white mt-3">⚖️ 피의 기소자 배심원 투표 실시간 집계 현황</h3>
                 <p class="text-xs text-gray-400 mt-1">학생들 기기 화면에 나타난 용의자 처형/구출 판결 표수가 클라우드로 실시간 반영 중입니다.</p>
             </div>
-
             <div id="court-scales-container" class="space-y-4 max-w-3xl mx-auto"></div>
-
             <div class="flex justify-center pt-2">
-                <button onclick="closeCourt()" class="bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-bold px-8 py-3..5 rounded-xl text-xs cursor-pointer shadow-lg">재판 결과 최종 선포 및 징계 봉쇄</button>
+                <button onclick="closeCourt()" class="bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-bold px-8 py-3.5 rounded-xl text-xs cursor-pointer shadow-lg">재판 결과 최종 선포 및 징계 봉쇄</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 선생님 전용 서버 주소 유지
         const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -128,6 +148,10 @@
             }
         });
 
+        function parseInputList(val, separator) {
+            return val.split(separator).map(s => s.trim()).filter(s => s.length > 0);
+        }
+
         function generateGameData() {
             const raw = document.getElementById('input-students').value;
             const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
@@ -136,18 +160,24 @@
 
             if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
 
-            let shuffled = [...names].sort(() => Math.random() - 0.5);
-            const grades = ["1", "2", "3"];
-            const hobbies = ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"];
-            const skills = ["축구", "탁구", "농구"];
-            const jobs = [
-                { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
-                { cn: "医生", py: "yīshēng", ko: "의사" },
-                { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
-                { cn: "作家", py: "zuòjiā", ko: "작가" }
-            ];
+            // 🔥 교사가 적어둔 텍스트 분석해서 단서 데이터 실시간 조합
+            const grades = parseInputList(document.getElementById('clue-grades').value, ',');
+            const hobbies = parseInputList(document.getElementById('clue-hobbies').value, ',');
+            const skills = parseInputList(document.getElementById('clue-skills').value, ',');
+            
+            const rawJobs = parseInputList(document.getElementById('clue-jobs').value, '\n');
+            const jobs = rawJobs.map(line => {
+                const parts = line.split(':');
+                return { ko: parts[0] || "미정", cn: parts[1] || "未知", py: parts[2] || "wèizhī" };
+            });
 
+            if(!grades.length || !hobbies.length || !skills.length || !jobs.length) {
+                alert("단서 Pool 목록 중 비어있는 항목이 있습니다. 값을 올바르게 채워주세요."); return;
+            }
+
+            let shuffled = [...names].sort(() => Math.random() - 0.5);
             let uploadData = {};
+
             shuffled.forEach((name, idx) => {
                 let role = "시민";
                 if(idx < mafiaCnt) role = "마피아";
@@ -162,15 +192,19 @@
                 uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
             });
 
+            // 학생단 단서 선택을 원격으로 뿌리기 위한 객체 추가 설정
+            const metaClues = { grade: grades, hobby: hobbies, skill: skills, job: jobs.map(j => j.ko) };
+
             db.ref('/').set({
                 students: uploadData,
+                cluesPool: metaClues, // 클라우드로 커스텀 단서 정복 업로드
                 rawVotes: {},
                 courtVotes: {},
                 courtStatus: { active: false, suspect: "" },
                 globalTimer: "05:00",
                 signal: "INIT"
             });
-            alert(`수사망 가동 완료! 이제 학생 기기에서 접속이 승인됩니다.`);
+            alert(`수사망 가동 완료! 교사 커스텀 단서 목록이 학생 기기로 완벽 연동되었습니다.`);
         }
 
         function startTimer() {
