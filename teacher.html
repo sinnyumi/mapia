@@ -80,8 +80,8 @@
     </div>
 
     <script>
-        // 🔥 전 세계 공용 무료 테스트 서버 연결 (수업용 임시)
-        const firebaseConfig = { databaseURL: "https://mafia-classroom-default-rtdb.firebaseio.com/" };
+        // 🔥 선생님의 실제 파이어베이스 서버 주소 연동 완료!
+        const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -91,7 +91,6 @@
         let currentSuspectList = [];
         let timerInterval = null;
 
-        // 게임 데이터 리셋 및 서버 감시 시작
         db.ref('students').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -159,7 +158,6 @@
                 uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
             });
 
-            // 데이터 클라우드 전송 및 동기화
             db.ref('/').set({
                 students: uploadData,
                 rawVotes: {},
@@ -218,6 +216,7 @@
                         <div class="flex justify-between items-center text-xs font-bold">
                             <div class="flex items-center space-x-2">
                                 <span class="text-gray-200 text-sm">${s.name}</span>
+                                ${statusBadge}
                             </div>
                             <span class="text-red-400 font-orbitron text-sm">${s.votedCount} 표</span>
                         </div>

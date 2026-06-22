@@ -149,6 +149,7 @@
         </div>
     </div>
 
+    <!-- 법정 재판 모달 -->
     <div id="modal-court" class="fixed inset-0 bg-black/92 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-[#161b22] border-2 border-red-900 rounded-3xl p-6 text-center space-y-6 max-w-sm w-full shadow-2xl">
             <div class="space-y-1">
@@ -170,6 +171,7 @@
         </div>
     </div>
 
+    <!-- 사망 모달 -->
     <div id="modal-dead" class="fixed inset-0 bg-[#0d1117]/95 flex flex-col items-center justify-center z-50 hidden">
         <div class="text-center space-y-4 max-w-xs px-4">
             <span class="text-6xl block animate-pulse">💀</span>
@@ -179,8 +181,8 @@
     </div>
 
     <script>
-        // 🔥 전 세계 공용 무료 테스트 서버 연결 (수업용 임시)
-        const firebaseConfig = { databaseURL: "https://mafia-classroom-default-rtdb.firebaseio.com/" };
+        // 🔥 선생님의 실제 파이어베이스 서버 주소 연동 완료!
+        const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -196,7 +198,6 @@
             job: ["운동선수", "의사", "인플루언서", "작가"]
         };
 
-        // 실시간으로 클라우드 서버 데이터 실시간 모니터링
         db.ref('students').on('value', (snapshot) => {
             studentsPool = snapshot.val() || {};
             if(myName && studentsPool[myName]) {
@@ -208,7 +209,6 @@
             }
         });
 
-        // 실시간 원격 제어 신호 수신
         db.ref('signal').on('value', (snapshot) => {
             const sig = snapshot.val();
             if(sig === 'START_TIMER') {
@@ -379,7 +379,6 @@
             if(rows.length < 3 || checked.length < 1) { alert("최소 3개 행 이상의 수사 정보를 입력하고 하단 용의자를 선택하셔야 합니다."); return; }
             let votes = []; checked.forEach(cb => votes.push(cb.value));
             
-            // 파이어베이스 데이터베이스에 투표 실시간 전송
             db.ref(`rawVotes/${myName}`).set(votes);
             checked.forEach(cb => cb.checked = false);
             alert("내 수사 데이터가 실시간으로 교사용 대시보드로 전송되었습니다!");
@@ -405,7 +404,6 @@
         function handleIndividualJudgement(choice) {
             const currentSuspect = courtSuspectsQueue[currentQueueIndex];
             
-            // 실시간 재판 카운트 데이터 증가
             db.ref(`courtVotes/${currentSuspect}/${choice}`).transaction((currentValue) => {
                 return (currentValue || 0) + 1;
             });
