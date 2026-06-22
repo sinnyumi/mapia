@@ -18,8 +18,6 @@
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
         @keyframes scan { 0%, 100% { top: 0%; opacity: 0.3; } 50% { top: 100%; opacity: 1; } }
         .scanner-line { animation: scan 2s infinite linear; }
-        
-        /* 모바일 터치 최적화 스타일 */
         select {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0a96d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -32,7 +30,6 @@
 </head>
 <body class="min-h-screen p-3 flex flex-col items-center justify-start max-w-md mx-auto">
 
-    <!-- 상단 실시간 사건 현황 바 (코난 타임라인 콘셉트) -->
     <div id="timer-bar" class="w-full bg-[#1b2b42]/95 border-2 border-[#b8860b]/40 rounded-2xl p-4 mb-4 flex justify-between items-center hidden shadow-2xl">
         <div class="flex items-center space-x-2.5">
             <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
@@ -42,33 +39,30 @@
     </div>
 
     <div class="w-full space-y-4">
-        <!-- 1단계: 사건 기록부 로그인 -->
+        <!-- 1단계: 로그인 -->
         <div id="step-login" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-6 text-center space-y-6 shadow-2xl">
             <div class="space-y-2">
                 <div class="text-3xl">🕵️‍♂️</div>
-                <h1 class="text-2xl font-black font-orbitron text-[#e0a96d] tracking-widest drop-shadow-[0_0_8px_rgba(224,169,109,0.3)]">DETECTIVE MAFIA</h1>
+                <h1 class="text-2xl font-black font-orbitron text-[#e0a96d] tracking-widest">DETECTIVE MAFIA</h1>
                 <p class="text-xs text-[#adbac7] font-medium leading-relaxed">경찰청 데이터베이스 동기화를 위해<br>본인의 한국어 이름을 정확히 입력하세요.</p>
             </div>
             <div class="space-y-4">
                 <input type="text" id="student-name" class="w-full bg-[#090e15] border-2 border-[#2a476c] rounded-2xl p-4 text-white text-center font-black text-lg focus:outline-none focus:border-[#e0a96d] transition-all placeholder-gray-600" placeholder="이름 입력 (예: 남도일)">
-                <button onclick="login()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-black py-4 rounded-2xl text-base transition-all shadow-xl shadow-red-950/50 cursor-pointer active:scale-[0.98]">수사 동기화 시작</button>
+                <button onclick="login()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-black py-4 rounded-2xl text-base transition-all shadow-xl cursor-pointer active:scale-[0.98]">수사 동기화 시작</button>
             </div>
         </div>
 
-        <!-- 2단계: 코난 추적 안경 스캔 패드 -->
+        <!-- 2단계: 스캔 패드 -->
         <div id="step-scanner" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-6 hidden flex flex-col items-center space-y-6 min-h-[400px] justify-center shadow-2xl">
             <div class="text-center space-y-2">
                 <h2 class="text-xl font-black text-[#e0a96d] font-orbitron tracking-wider">TARGET TRACKING</h2>
                 <p class="text-xs text-[#adbac7] font-medium">생체 데이터 확인을 위해 지문 원형 패드를 <br><span class="text-red-400 font-bold underline">3초간 꾹 누르고 계십시오.</span></p>
             </div>
-            
-            <!-- 코난 나비넥타이/스캔 감성 패드 -->
             <div id="touch-zone" class="relative w-40 h-40 bg-[#090e15] border-4 border-[#e0a96d]/50 rounded-full flex items-center justify-center cursor-pointer select-none active:scale-95 transition-all overflow-hidden shadow-2xl">
                 <div id="laser" class="absolute left-0 w-full h-1 bg-[#e0a96d] shadow-[0_0_15px_#e0a96d] hidden scanner-line"></div>
                 <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-[#e0a96d]/20 transition-all duration-75" style="height: 0%;"></div>
                 <svg class="w-24 h-20 text-[#e0a96d] opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M12 11c0-.797.15-1.558.422-2.253m0 0A7.993 7.993 0 0120 12V14m-8-3a1 1 0 00-1-1H7m4 1v4m0 0v1a3 3 0 01-3 3H6a3 3 0 01-3-3V11.5c0-3.038 2.462-5.5 5.5-5.5 1.517 0 2.894.614 3.903 1.61M12 11h.01M21 14a3 3 0 01-3 3h-1a3 3 0 01-3-3v-1m6 1v3.5M12 21h.01M12 3h.01M12 17h.01"></path></svg>
             </div>
-            
             <div class="h-6 flex items-center justify-center">
                 <p id="scan-status" class="text-sm font-bold text-[#adbac7]">대기 중...</p>
             </div>
@@ -80,7 +74,7 @@
             <h2 class="text-2xl font-black text-white tracking-widest animate-pulse">사건 파일 매칭 중...</h2>
         </div>
 
-        <!-- 4단계: 정체 최초 확인 창 (이후 숨겨짐) -->
+        <!-- 4단계: 정체 최초 확인 창 -->
         <div id="step-reveal" class="bg-[#101b2b] border-2 border-red-900/50 rounded-3xl p-5 hidden space-y-5 shadow-2xl">
             <div class="text-center space-y-1">
                 <h2 id="role-title" class="text-xl font-black px-6 py-3 rounded-xl inline-block font-orbitron shadow-md">🚨 프로필 로드 완료</h2>
@@ -96,21 +90,17 @@
                     <div class="bg-[#142337] p-2.5 rounded-lg border border-[#223956] col-span-2"><span class="text-gray-400 block text-[10px] mb-0.5">장래희망 (중국어 한자 & 병음)</span><span class="reveal-job text-white font-bold text-sm leading-tight"></span></div>
                 </div>
             </div>
-            
             <p id="role-tip" class="text-xs text-[#f0f6fc] bg-[#1b2b42] p-3.5 rounded-xl border border-[#223956] leading-relaxed font-semibold shadow-sm"></p>
-            
-            <!-- 🔥 보안의 핵심: 확인 후 역할을 숨겨버리는 버튼 -->
             <button onclick="goInvestigation()" class="w-full bg-gradient-to-r from-[#e0a96d] to-[#b8860b] text-slate-900 font-black py-4 rounded-2xl text-base shadow-lg cursor-pointer">🕶️ 정체 확인 완료 (비밀 수사 메모장 진입)</button>
         </div>
 
-        <!-- 5단계: 모달형 세로 수사 기록지 (보안 완벽 적용) -->
+        <!-- 5단계: 모달형 세로 수사 기록지 -->
         <div id="step-sheet" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-4 hidden space-y-5 shadow-2xl">
             <div class="border-b border-[#223956] pb-2 flex justify-between items-center">
                 <h1 class="text-base font-black text-white tracking-tight flex items-center">🔎 명탐정 수사기록지</h1>
                 <span id="display-my-name" class="text-xs bg-[#090e15] text-[#e0a96d] font-black px-3 py-1 rounded-lg border border-[#223956]"></span>
             </div>
 
-            <!-- 🔥 [활동 1] 모바일용 세로 배치 카드형 수사 리스트 (가로스크롤 제거 완료!) -->
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-black text-gray-300 tracking-wider flex items-center">
@@ -120,12 +110,9 @@
                         + 용의자 추가
                     </button>
                 </div>
-                
-                <!-- 카드가 추가될 세로 전용 컨테이너 -->
                 <div id="interview-card-container" class="space-y-3"></div>
             </div>
 
-            <!-- [활동 2] 모주일 고발 투표 용지 -->
             <div class="bg-[#090e15] p-4 rounded-2xl border border-[#223956] space-y-3">
                 <h3 class="text-xs font-black text-red-400 flex items-center">
                     <span class="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5"></span> [활동 2] 마피아 지목 최종 투표 (1~3명)
@@ -154,7 +141,7 @@
             </p>
             <div class="grid grid-cols-2 gap-2.5 pt-0.5">
                 <button onclick="handleIndividualJudgement('execute')" class="bg-gradient-to-b from-red-800 to-red-600 text-white font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg">💥 처형 (処刑)</button>
-                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救出)</button>
+                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-gradient to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救출)</button>
             </div>
         </div>
     </div>
@@ -169,7 +156,6 @@
     </div>
 
     <script>
-        // 🔥 선생님 파이어베이스 주소 유지
         const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -179,12 +165,8 @@
         let courtSuspectsQueue = []; 
         let currentQueueIndex = 0;
 
-        const clues = {
-            grade: ["1학년", "2학년", "3학년"],
-            hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"],
-            skill: ["축구", "탁구", "농구"],
-            job: ["운동선수", "의사", "인플루언서", "작가"]
-        };
+        // 🔥 교사가 뿌려준 원격 단서 Pool 저장소 (초기값 설정)
+        let cluesPool = { grade: [], hobby: [], skill: [], job: [] };
 
         db.ref('students').on('value', (snapshot) => {
             studentsPool = snapshot.val() || {};
@@ -195,6 +177,12 @@
                     document.getElementById('modal-dead').classList.remove('hidden');
                 }
             }
+        });
+
+        // 🔥 교사창에서 세팅한 커스텀 단서 목록을 실시간 수신
+        db.ref('cluesPool').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) cluesPool = data;
         });
 
         db.ref('signal').on('value', (snapshot) => {
@@ -260,7 +248,7 @@
                 document.getElementById('step-buildup').classList.add('hidden');
                 document.getElementById('step-reveal').classList.remove('hidden');
                 
-                document.querySelectorAll('.reveal-grade').forEach(el => el.innerText = `${myData.profile.grade}학년`);
+                document.querySelectorAll('.reveal-grade').forEach(el => el.innerText = myData.profile.grade.includes("학년") ? myData.profile.grade : `${myData.profile.grade}학년`);
                 document.querySelectorAll('.reveal-hobby').forEach(el => el.innerText = myData.profile.hobby);
                 document.querySelectorAll('.reveal-skill').forEach(el => el.innerText = myData.profile.skill);
                 document.querySelectorAll('.reveal-job').forEach(el => el.innerHTML = `${myData.profile.job.ko} <br><span class="text-[#e0a96d] font-bold font-mono text-[10px]">[${myData.profile.job.cn} / ${myData.profile.job.py}]</span>`);
@@ -275,15 +263,14 @@
                 } else {
                     title.innerText = myData.role === "경찰" ? "⚡ 당신은 경찰입니다." : "👥 당신은 시민입니다.";
                     title.className = "text-lg font-black bg-gradient-to-r from-slate-800 to-slate-900 text-[#e0a96d] border border-[#e0a96d]/40 px-5 py-2 rounded-xl";
-                    tip.innerHTML = "당신은 무조건 <strong class='text-[#e0a96d]'>100% 진실만을 답변</strong>해야 합니다. 대화 릴레이를 통해 가짜 알리바이를 유포하고 다니는 범인을 찾아내세요.";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-[#e0a96d]'>100% 진실만을 답변</strong>해야 합니다. 가짜 알리바이를 유포하고 다니는 범인을 찾아내세요.";
                 }
             }, 2000);
         }
 
-        // 🔥 철저한 보안: 역할을 숨기고 메모장만 진입
         function goInvestigation() {
             document.getElementById('display-my-name').innerText = `명탐정: ${myName}`;
-            document.getElementById('step-reveal').innerHTML = ""; // 렌더링된 정체 완벽 파괴 및 숨김
+            document.getElementById('step-reveal').innerHTML = ""; 
             document.getElementById('step-reveal').classList.add('hidden');
             document.getElementById('step-sheet').classList.remove('hidden');
             rebuildInterviewSheet();
@@ -296,7 +283,6 @@
             renderCheckboxes();
         }
 
-        // 🔥 [대변혁] 가로 테이블을 세로 정렬 미니 카드형태로 전면 개조
         function addInterviewCard() {
             const container = document.getElementById('interview-card-container');
             let studentOpts = `<option value="">용의자 이름 선택</option>`;
@@ -306,6 +292,8 @@
                     else studentOpts += `<option value="${k}" disabled class="text-red-500/30 line-through">${k} [❌ 탈락]</option>`;
                 }
             });
+            
+            // 🔥 교사창에서 실시간 수신된 단서 목록으로 select 태그 렌더링
             const renderOptions = (arr) => arr.map(v => `<option value="${v}">${v}</option>`).join('');
             
             const card = document.createElement('div');
@@ -318,19 +306,19 @@
                 <div class="grid grid-cols-2 gap-2 pt-0.5 text-gray-300">
                     <div class="flex items-center space-x-1">
                         <span class="text-[10px] text-gray-500 font-bold shrink-0">학년:</span>
-                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(["1학년","2학년","3학년"])}</select>
+                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(cluesPool.grade)}</select>
                     </div>
                     <div class="flex items-center space-x-1">
                         <span class="text-[10px] text-gray-500 font-bold shrink-0">취미:</span>
-                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(clues.hobby)}</select>
+                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(cluesPool.hobby)}</select>
                     </div>
                     <div class="flex items-center space-x-1">
                         <span class="text-[10px] text-gray-500 font-bold shrink-0">능력:</span>
-                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(clues.skill)}</select>
+                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(cluesPool.skill)}</select>
                     </div>
                     <div class="flex items-center space-x-1">
                         <span class="text-[10px] text-gray-500 font-bold shrink-0">장래:</span>
-                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(clues.job)}</select>
+                        <select class="bg-[#142337] border border-[#223956] rounded-lg p-2 w-full text-white text-[11px] focus:outline-none">${renderOptions(cluesPool.job)}</select>
                     </div>
                 </div>
             `;
