@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 마피아 비밀 지문인식 패드 (학생용)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Pretendard:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background: radial-gradient(circle at top, #1c232e 0%, #0d1117 100%);
+            color: #f0f6fc; 
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        @keyframes scan { 0%, 100% { top: 0%; opacity: 0.4; } 50% { top: 100%; opacity: 1; } }
+        .scanner-line { animation: scan 2.2s infinite linear; }
+        
+        /* 터치하기 편하도록 화살표 간격 및 크기 대형화 */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            background-size: 1.2em;
+            padding-right: 1.8rem !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-3 flex flex-col items-center justify-start">
+
+    <div id="timer-bar" class="w-full max-w-xl bg-[#161b22]/95 border-2 border-[#444c56] rounded-2xl p-4 mb-4 flex justify-between items-center hidden shadow-2xl">
+        <div class="flex items-center space-x-2.5">
+            <span class="w-3 h-3 rounded-full bg-cyan-500 animate-pulse"></span>
+            <span class="text-sm font-black text-[#adbac7] tracking-wider">낮 활동 조사 중</span>
+        </div>
+        <span id="global-timer" class="font-orbitron text-2xl font-black text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">05:00</span>
+    </div>
+
+    <div class="w-full max-w-xl space-y-4">
+        <div id="step-login" class="bg-[#161b22] border-2 border-[#30363d] rounded-3xl p-8 text-center space-y-6 shadow-2xl">
+            <div class="space-y-3">
+                <h1 class="text-3xl font-black font-orbitron text-red-500 tracking-widest drop-shadow-[0_0_10px_rgba(239,68,68,0.4)]">MAFIA SECURITY</h1>
+                <p class="text-sm text-[#adbac7] font-bold leading-relaxed">본인의 한국어 이름을 기입한 뒤<br>아래 인증 버튼을 눌러주세요.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="student-name" class="w-full bg-[#0d1117] border-2 border-[#444c56] rounded-2xl p-5 text-white text-center font-black text-xl focus:outline-none focus:border-red-500 transition-all placeholder-[#484f58]" placeholder="이름 입력 (예: 김철수)">
+                <button onclick="login()" class="w-full bg-gradient-to-r from-red-600 to-red-500 text-white font-black py-4 rounded-2xl text-base transition-all shadow-xl shadow-red-950/50 cursor-pointer active:scale-[0.98]">지문 인식기 동기화</button>
+            </div>
+        </div>
+
+        <div id="step-scanner" class="bg-[#161b22] border-2 border-[#30363d] rounded-3xl p-8 hidden flex flex-col items-center space-y-8 min-h-[440px] justify-center shadow-2xl">
+            <div class="text-center space-y-3">
+                <h2 class="text-2xl font-black text-red-500 font-orbitron tracking-wider">SCAN IDENTITY</h2>
+                <p class="text-sm text-[#adbac7] font-medium">정체 보안 등급 인식을 위해 지문 원형 패드를 <br><span class="text-red-400 font-bold underline">3초간 꾹 누르고 계십시오.</span></p>
+            </div>
+            
+            <div id="touch-zone" class="relative w-44 h-44 bg-[#0d1117] border-4 border-red-500/40 rounded-full flex items-center justify-center cursor-pointer select-none active:scale-95 transition-all overflow-hidden shadow-2xl shadow-black">
+                <div id="laser" class="absolute left-0 w-full h-1.5 bg-red-500 shadow-[0_0_15px_#ff3333] hidden scanner-line"></div>
+                <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-red-500/20 transition-all duration-75" style="height: 0%;"></div>
+                <svg class="w-28 h-24 text-red-500 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3" d="M12 11c0-.797.15-1.558.422-2.253m0 0A7.993 7.993 0 0120 12V14m-8-3a1 1 0 00-1-1H7m4 1v4m0 0v1a3 3 0 01-3 3H6a3 3 0 01-3-3V11.5c0-3.038 2.462-5.5 5.5-5.5 1.517 0 2.894.614 3.903 1.61M12 11h.01M21 14a3 3 0 01-3 3h-1a3 3 0 01-3-3v-1m6 1v3.5M12 21h.01M12 3h.01M12 17h.01"></path></svg>
+            </div>
+            
+            <div class="h-6 flex items-center justify-center">
+                <p id="scan-status" class="text-base font-bold text-[#adbac7]">대기 중...</p>
+            </div>
+        </div>
+
+        <div id="step-buildup" class="bg-[#0d1117] border-2 border-[#30363d] rounded-3xl p-12 text-center hidden flex-col items-center justify-center min-h-[440px] shadow-2xl">
+            <span class="w-5 h-5 rounded-full bg-red-500 animate-ping mb-6"></span>
+            <h2 class="text-3xl font-black text-white tracking-widest animate-pulse">당신은 바로...</h2>
+        </div>
+
+        <div id="step-reveal" class="bg-[#161b22] border-2 border-[#30363d] rounded-3xl p-6 hidden space-y-6 shadow-2xl">
+            <div class="text-center space-y-2">
+                <h2 id="role-title" class="text-2xl font-black px-8 py-3.5 rounded-2xl inline-block font-orbitron shadow-md tracking-wider">🚨 정체 확인 중</h2>
+                <p id="role-warn" class="text-sm font-black text-red-400">행동 강령 미션을 필독하세요!</p>
+            </div>
+            
+            <div class="bg-[#0d1117] border border-[#444c56] rounded-2xl p-5 space-y-3 shadow-inner">
+                <h3 class="text-cyan-400 text-sm font-black flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 mr-2"></span> 📋 내 수사 파일 (친구가 질문 시 대답할 것)
+                </h3>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div class="bg-[#161b22] p-3 rounded-xl border border-[#30363d]"><span class="text-[#adbac7] font-medium block text-xs mb-0.5">학년</span><span class="reveal-grade text-white font-black text-base"></span></div>
+                    <div class="bg-[#161b22] p-3 rounded-xl border border-[#30363d]"><span class="text-[#adbac7] font-medium block text-xs mb-0.5">취미</span><span class="reveal-hobby text-white font-black text-base"></span></div>
+                    <div class="bg-[#161b22] p-3 rounded-xl border border-[#30363d]"><span class="text-[#adbac7] font-medium block text-xs mb-0.5">희망 능력</span><span class="reveal-skill text-white font-black text-base"></span></div>
+                    <div class="bg-[#161b22] p-3 rounded-xl border border-[#30363d] col-span-2"><span class="text-[#adbac7] font-medium block text-xs mb-0.5">장래희망 (중국어 한자 & 병음)</span><span class="reveal-job text-white font-black text-base leading-tight"></span></div>
+                </div>
+            </div>
+            
+            <p id="role-tip" class="text-sm text-[#f0f6fc] bg-[#22272e] p-4 rounded-xl border border-[#444c56] leading-relaxed font-semibold shadow-sm"></p>
+            
+            <button onclick="goInvestigation()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black py-4.5 rounded-2xl text-base shadow-lg cursor-pointer">📝 수사활동판 화면 진입</button>
+        </div>
+
+        <div id="step-sheet" class="bg-[#161b22] border-2 border-[#30363d] rounded-3xl p-5 hidden space-y-6 shadow-2xl">
+            <div class="border-b-2 border-[#30363d] pb-3 flex justify-between items-center">
+                <h1 class="text-xl font-black text-white tracking-tight">🕵️ 중국어 마피아 수사관기록지</h1>
+                <span id="display-my-name" class="text-sm bg-[#22272e] text-cyan-400 font-black px-3.5 py-1.5 rounded-xl border border-[#444c56]"></span>
+            </div>
+
+            <div class="bg-[#0d1117] border-2 border-cyan-500/30 rounded-2xl p-4 space-y-2.5 shadow-xl">
+                <div class="flex justify-between items-center border-b border-[#22272e] pb-2">
+                    <span id="my-badge-role" class="text-xs font-black px-3 py-1 rounded-full bg-gray-950 tracking-wide">역할</span>
+                    <span class="text-xs text-[#adbac7] font-black flex items-center">🗣️ 내 답변 프로필 기억창</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-[#adbac7] font-bold">
+                    <div>학년: <span class="reveal-grade text-cyan-400 font-black text-base"></span></div>
+                    <div>취미: <span class="reveal-hobby text-cyan-400 font-black text-base"></span></div>
+                    <div>능력: <span class="reveal-skill text-cyan-400 font-black text-base"></span></div>
+                    <div class="col-span-2">장래희망: <span class="reveal-job text-cyan-400 font-black text-base"></span></div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-black text-[#adbac7] tracking-wider uppercase flex items-center">
+                        <span class="w-2 h-2 rounded-full bg-cyan-500 mr-2"></span> [활동 1] 친구 3명 수사 정보 기록부
+                    </h2>
+                    <button onclick="addInterviewRow()" class="bg-[#22272e] hover:bg-[#343b44] text-cyan-400 font-black px-3 py-2 rounded-xl text-xs border border-[#444c56] transition-colors cursor-pointer">
+                        + 행 추가
+                    </button>
+                </div>
+                
+                <div class="overflow-hidden border-2 border-[#30363d] rounded-2xl bg-[#0d1117] shadow-inner">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left border-collapse min-w-[560px]">
+                            <thead>
+                                <tr class="bg-[#161b22] text-[#adbac7] border-b-2 border-[#30363d] text-xs font-bold">
+                                    <th class="p-3 w-[24%]">친구 이름</th>
+                                    <th class="p-3">학년</th>
+                                    <th class="p-3">취미</th>
+                                    <th class="p-3">희망 능력</th>
+                                    <th class="p-3">장래희망</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interview-list" class="divide-y divide-[#30363d]/70">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#0d1117] p-5 rounded-2xl border-2 border-[#30363d] space-y-3">
+                <h3 class="text-sm font-black text-red-400 flex items-center">
+                    <span class="w-2 h-2 rounded-full bg-red-400 mr-2"></span> [활동 2] 변조 마피아 고발 투표 용지 (1~3명)
+                </h3>
+                <div id="vote-checkboxes" class="grid grid-cols-2 gap-2.5 pt-1"></div>
+            </div>
+
+            <button onclick="submitInvestigation()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-black py-4.5 rounded-2xl text-base shadow-xl cursor-pointer">🚨 최종 진술 수사기록 제출</button>
+        </div>
+    </div>
+
+    <div id="modal-court" class="fixed inset-0 bg-black/92 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-[#161b22] border-2 border-red-900 rounded-3xl p-6 text-center space-y-6 max-w-sm w-full shadow-2xl transition-all transform scale-100">
+            <div class="space-y-1">
+                <span class="text-4xl block animate-bounce">🌙</span>
+                <h2 class="text-xl font-black text-red-500 font-orbitron tracking-wider">법정 배심원 즉결 심사</h2>
+                <span id="court-progress-badge" class="inline-block text-xs bg-red-950 text-red-400 px-3 py-1 rounded-full font-black border border-red-900/40">용의자 1/1</span>
+            </div>
+
+            <div class="bg-[#0d1117] p-5 rounded-2xl border-2 border-[#444c56] shadow-inner">
+                <span class="text-xs text-[#adbac7] font-black block mb-1">피의 기소 대상 학생</span>
+                <span id="current-suspect-focus-name" class="text-3xl font-black text-white tracking-wide drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">홍길동</span>
+            </div>
+
+            <p class="text-sm text-[#f0f6fc] font-bold leading-relaxed px-1">
+                위 학생이 거짓말을 전개한 마피아가 맞습니까? <br>배심원 판결을 투표해 주세요.
+            </p>
+
+            <div class="grid grid-cols-2 gap-3 pt-1">
+                <button onclick="handleIndividualJudgement('execute')" class="bg-gradient-to-b from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white font-black py-4 rounded-xl text-sm cursor-pointer shadow-lg active:scale-95">💥 처형 (処刑)</button>
+                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-black py-4 rounded-xl text-sm cursor-pointer shadow-lg active:scale-95">🌿 살리기 (救出)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-dead" class="fixed inset-0 bg-[#0d1117]/95 flex flex-col items-center justify-center z-50 hidden">
+        <div class="text-center space-y-4 max-w-xs px-4">
+            <span class="text-6xl block animate-pulse">💀</span>
+            <h2 class="text-3xl font-black text-red-600 font-orbitron tracking-widest">DEATH OUT</h2>
+            <p class="text-sm text-[#adbac7] font-bold leading-relaxed">당신은 즉결 재판 다수결에 의해 사망 처리되었습니다.<br>이 단말은 원천 봉쇄(동결) 처리됩니다.</p>
+        </div>
+    </div>
+
+    <script {timestamp="2026-06-22"}>
+        const bc = new BroadcastChannel('mafia_classroom_channel');
+        let myName = "", myData = null, studentsPool = {};
+        let scanProgress = 0, scanInterval = null;
+
+        let courtSuspectsQueue = []; 
+        let currentQueueIndex = 0;
+
+        const clues = {
+            grade: ["1학년", "2학년", "3학년"],
+            hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"],
+            skill: ["축구", "탁구", "농구"],
+            job: ["운동선수", "의사", "인플루언서", "작가"]
+        };
+
+        function loadPoolFromStorage() {
+            const stored = localStorage.getItem('mafia_students_data');
+            if (stored) { studentsPool = JSON.parse(stored); }
+        }
+        window.onload = loadPoolFromStorage;
+
+        function login() {
+            loadPoolFromStorage();
+            myName = document.getElementById('student-name').value.trim();
+            if(!myName || !studentsPool[myName]) { alert("등록되지 않은 이름입니다."); return; }
+            myData = studentsPool[myName];
+            if(!myData.isAlive) { document.getElementById('modal-dead').classList.remove('hidden'); return; }
+
+            document.getElementById('step-login').classList.add('hidden');
+            document.getElementById('step-scanner').classList.remove('hidden');
+            bindScannerEvents();
+
+            const court = localStorage.getItem('mafia_court_status');
+            if(court) { initSequentialCourt(JSON.parse(court).suspect); }
+        }
+
+        function bindScannerEvents() {
+            const zone = document.getElementById('touch-zone');
+            zone.onmousedown = startScan; zone.onmouseup = stopScan; zone.onmouseleave = stopScan;
+            zone.ontouchstart = (e) => { e.preventDefault(); startScan(); }; zone.ontouchend = stopScan;
+        }
+
+        function startScan() {
+            document.getElementById('laser').classList.remove('hidden');
+            document.getElementById('scan-status').innerText = "생체 코드 식별 중...";
+            document.getElementById('scan-status').className = "text-sm font-black text-cyan-400 animate-pulse";
+            scanInterval = setInterval(() => {
+                scanProgress += 5; document.getElementById('progress-bar').style.height = `${scanProgress}%`;
+                if(scanProgress >= 100) { clearInterval(scanInterval); triggerBuildup(); }
+            }, 150);
+        }
+
+        function stopScan() {
+            if(scanProgress < 100) {
+                clearInterval(scanInterval); scanProgress = 0;
+                document.getElementById('progress-bar').style.height = `0%`;
+                document.getElementById('laser').classList.add('hidden');
+                document.getElementById('scan-status').innerText = "스캔 실패! 손가락을 유지하세요.";
+                document.getElementById('scan-status').className = "text-sm font-bold text-red-500 animate-bounce";
+            }
+        }
+
+        function triggerBuildup() {
+            document.getElementById('step-scanner').classList.add('hidden');
+            document.getElementById('step-buildup').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('step-buildup').classList.add('hidden');
+                document.getElementById('step-reveal').classList.remove('hidden');
+                
+                document.querySelectorAll('.reveal-grade').forEach(el => el.innerText = `${myData.profile.grade}학년`);
+                document.querySelectorAll('.reveal-hobby').forEach(el => el.innerText = myData.profile.hobby);
+                document.querySelectorAll('.reveal-skill').forEach(el => el.innerText = myData.profile.skill);
+                document.querySelectorAll('.reveal-job').forEach(el => el.innerHTML = `${myData.profile.job.ko} <br><span class="text-amber-400 font-bold font-mono text-xs">[${myData.profile.job.cn} / ${myData.profile.job.py}]</span>`);
+
+                const title = document.getElementById('role-title');
+                const badge = document.getElementById('my-badge-role');
+                const tip = document.getElementById('role-tip');
+
+                if(myData.role === "마피아") {
+                    title.innerText = "🚨 당신은 마피아입니다.";
+                    title.className = "text-2xl font-black bg-gradient-to-r from-red-950 to-red-900 text-red-400 border-2 border-red-500/50 px-6 py-2 rounded-xl shadow-md";
+                    badge.innerText = "🚨 마피아 (위조범)";
+                    badge.className = "text-xs font-black px-3 py-1 rounded-full bg-red-950 border border-red-900 text-red-400 shadow-sm";
+                    tip.innerHTML = "교실을 돌아다니며 중국어로 소통할 때, 당신의 단서 중 <strong class='text-red-400 underline'>오직 딱 1가지 항목만 거짓말</strong>을 해서 답변해야 합니다. 모순을 찾으려는 수사관 무리들을 교묘하게 유인하고 기만하십시오!";
+                } else {
+                    title.innerText = myData.role === "경찰" ? "⚡ 당신은 경찰입니다." : "👥 당신은 시민입니다.";
+                    title.className = myData.role === "경찰" ? "text-2xl font-black bg-gradient-to-r from-cyan-950 to-cyan-900 text-cyan-400 border-2 border-cyan-500/50 px-6 py-2 rounded-xl shadow-md" : "text-2xl font-black bg-gradient-to-r from-emerald-950 to-emerald-900 text-emerald-400 border-2 border-emerald-500/50 px-6 py-2 rounded-xl shadow-md";
+                    badge.innerText = myData.role === "경찰" ? "⚡ 경찰 (수사관)" : "👥 선량한 시민";
+                    badge.className = myData.role === "경찰" ? "text-xs bg-cyan-950 text-cyan-400 px-3 py-1 rounded-full font-black border border-cyan-800" : "text-xs bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full font-black border border-emerald-800";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-cyan-400'>100% 진실만을 답변</strong>해야 합니다. 대화 릴레이를 펼치며 모순되는 가짜 알리바이를 유포하고 다니는 스파이 마피아를 고발하세요.";
+                }
+            }, 3000);
+        }
+
+        function goInvestigation() {
+            document.getElementById('display-my-name').innerText = `수사관: ${myName}`;
+            document.getElementById('step-reveal').classList.add('hidden');
+            document.getElementById('step-sheet').classList.remove('hidden');
+            rebuildInterviewSheet();
+        }
+
+        function rebuildInterviewSheet() {
+            const list = document.getElementById('interview-list'); list.innerHTML = "";
+            for(let i=0; i<3; i++) { addInterviewRow(); }
+            renderCheckboxes();
+        }
+
+        // ⭐ 선택 필드 패딩 및 글씨 대폭 패치 적용
+        function addInterviewRow() {
+            const list = document.getElementById('interview-list');
+            let studentOpts = `<option value="">선택</option>`;
+            Object.keys(studentsPool).forEach(k => {
+                if(k !== myName) {
+                    if (studentsPool[k].isAlive) studentOpts += `<option value="${k}">${k}</option>`;
+                    else studentOpts += `<option value="${k}" disabled class="text-red-500/40 line-through">${k} [❌ 사망]</option>`;
+                }
+            });
+            const renderOptions = (arr) => arr.map(v => `<option value="${v}">${v}</option>`).join('');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-[#161b22]/40 transition-colors";
+            tr.innerHTML = `
+                <td class="p-1.5 font-bold">
+                    <select onchange="renderCheckboxes()" class="bg-[#0d1117] border border-[#444c56] rounded-xl p-3 w-full text-white font-black text-sm focus:border-cyan-500 focus:outline-none target-name">${studentOpts}</select>
+                </td>
+                <td class="p-1.5">
+                    <select class="bg-[#0d1117] border border-[#444c56] rounded-xl p-3 w-full text-white text-xs focus:outline-none">${renderOptions(["1학년","2학년","3학년"])}</select>
+                </td>
+                <td class="p-1.5">
+                    <select class="bg-[#0d1117] border border-[#444c56] rounded-xl p-3 w-full text-white text-xs focus:outline-none">${renderOptions(clues.hobby)}</select>
+                </td>
+                <td class="p-1.5">
+                    <select class="bg-[#0d1117] border border-[#444c56] rounded-xl p-3 w-full text-white text-xs focus:outline-none">${renderOptions(clues.skill)}</select>
+                </td>
+                <td class="p-1.5">
+                    <select class="bg-[#0d1117] border border-[#444c56] rounded-xl p-3 w-full text-white text-xs focus:outline-none">${renderOptions(clues.job)}</select>
+                </td>
+            `;
+            list.appendChild(tr);
+        }
+
+        // ⭐ 체크박스 라벨 및 선택 패드 대형 확대
+        function renderCheckboxes() {
+            const container = document.getElementById('vote-checkboxes'); container.innerHTML = "";
+            const targets = document.querySelectorAll('.target-name');
+            let set = new Set(); targets.forEach(t => { if(t.value) set.add(t.value); });
+
+            let validCount = 0;
+            set.forEach(name => {
+                if(studentsPool[name] && studentsPool[name].isAlive) {
+                    validCount++;
+                    container.innerHTML += `
+                        <label class="flex items-center space-x-3 bg-[#0d1117] p-4 rounded-xl border-2 border-[#444c56] hover:border-red-500/50 transition-all cursor-pointer select-none">
+                            <input type="checkbox" value="${name}" class="w-5 h-5 text-red-500 bg-[#161b22] border-[#444c56] rounded focus:ring-red-500 v-box" onchange="limitCheck(this)">
+                            <span class="text-sm font-black text-[#f0f6fc]">${name}</span>
+                        </label>`;
+                }
+            });
+            if(validCount === 0) container.innerHTML = `<p class="col-span-2 text-xs text-[#8b949e] italic text-center py-4 w-full">상단 조사 명단에 추가된 학생이 없습니다.</p>`;
+        }
+
+        function limitCheck(el) {
+            const checked = document.querySelectorAll('.v-box:checked');
+            if(checked.length > 3) { alert("의심 용의자는 한번에 최대 3명까지만 선택 고발 가능합니다."); el.checked = false; }
+        }
+
+        function submitInvestigation() {
+            const checked = document.querySelectorAll('.v-box:checked');
+            const rows = document.querySelectorAll('#interview-list tr');
+            if(rows.length < 3 || checked.length < 1) { alert("최소 3개 행 이상의 수사 정보를 입력하고 하단 용의자를 선택하셔야 합니다."); return; }
+            let votes = []; checked.forEach(cb => votes.push(cb.value));
+            
+            // 중복 중과세 방지 보정: voter 본인 이름 세션을 포함하여 브로드캐스트 발송
+            bc.postMessage({ type: 'SUBMIT_VOTE', voter: myName, votes: votes });
+            checked.forEach(cb => cb.checked = false);
+            alert("내 수사 데이터 패킷이 성공적으로 제출되었습니다!");
+        }
+
+        function initSequentialCourt(suspectRawString) {
+            courtSuspectsQueue = suspectRawString.split(', ').filter(n => n.trim().length > 0);
+            currentQueueIndex = 0;
+            if(courtSuspectsQueue.length === 0) return;
+
+            if (myName && studentsPool[myName]?.isAlive) {
+                renderCurrentQueueCard();
+                document.getElementById('modal-court').classList.remove('hidden');
+            }
+        }
+
+        function renderCurrentQueueCard() {
+            const currentSuspect = courtSuspectsQueue[currentQueueIndex];
+            document.getElementById('current-suspect-focus-name').innerText = currentSuspect;
+            document.getElementById('court-progress-badge').innerText = `용의자 기소 심사 (${currentQueueIndex + 1} / ${courtSuspectsQueue.length})`;
+        }
+
+        function handleIndividualJudgement(choice) {
+            const currentSuspect = courtSuspectsQueue[currentQueueIndex];
+            bc.postMessage({ 
+                type: 'CAST_COURT_INDIVIDUAL', 
+                voter: myName, 
+                suspectName: currentSuspect, 
+                choice: choice 
+            });
+
+            currentQueueIndex++;
+            if (currentQueueIndex < courtSuspectsQueue.length) {
+                renderCurrentQueueCard();
+            } else {
+                document.getElementById('modal-court').classList.add('hidden');
+                alert("기소 명단 내의 모든 용의자에 대한 1:1 개별 재판 심의 투표가 완료되었습니다.");
+                courtSuspectsQueue = [];
+                currentQueueIndex = 0;
+            }
+        }
+
+        bc.onmessage = (e) => {
+            if(e.data.type === 'INIT_GAME') { studentsPool = e.data.data; }
+            if(e.data.type === 'START_TIMER') {
+                document.getElementById('timer-bar').classList.remove('hidden');
+                let sec = 300;
+                let iv = setInterval(() => {
+                    sec--; if(sec<=0) clearInterval(iv);
+                    const m = String(Math.floor(sec/60)).padStart(2,'0');
+                    const s = String(sec%60).padStart(2,'0');
+                    document.getElementById('global-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            }
+            if(e.data.type === 'START_COURT') { initSequentialCourt(e.data.suspect); }
+            if(e.data.type === 'KILL_STUDENT' && e.data.target === myName) {
+                document.getElementById('modal-court').classList.add('hidden');
+                document.getElementById('modal-dead').classList.remove('hidden');
+            }
+            if(e.data.type === 'FREE_STUDENT' && e.data.target === myName) {
+                document.getElementById('modal-court').classList.add('hidden');
+            }
+            if(e.data.type === 'RESET_ROUND_SHEETS') {
+                loadPoolFromStorage(); rebuildInterviewSheet(); 
+            }
+        };
+    </script>
+</body>
+</html>
