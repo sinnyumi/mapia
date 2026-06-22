@@ -11,12 +11,24 @@
     <style>
         body { font-family: 'Noto Sans KR', sans-serif; background-color: #090f17; color: #e2e8f0; }
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        /* 표를 받은 용의자를 강조하기 위한 코난 표적 광채 애니메이션 */
+        .suspect-target-glow {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.1) !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.3);
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
+            50% { border-color: rgba(239, 68, 68, 1); }
+        }
     </style>
 </head>
 <body class="min-h-screen p-6 flex flex-col items-center">
 
     <div class="w-full max-w-7xl space-y-6">
-        <!-- 상단 헤더 배너 (초대형 글씨 크기 패치) -->
+        <!-- 상단 헤더 배너 -->
         <div class="bg-[#101b2b] border-4 border-[#b8860b]/60 rounded-3xl p-8 flex justify-between items-center shadow-2xl">
             <div>
                 <h1 class="text-4xl lg:text-5xl font-black text-[#e0a96d] font-orbitron tracking-widest drop-shadow-[0_0_15px_rgba(224,169,109,0.4)]">CRIMINAL INVESTIGATION HQ</h1>
@@ -29,11 +41,10 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- 1. 클래스 설정 패널 (보안 숨기기 기능 탑재) -->
+            <!-- 1. 클래스 설정 패널 (보안 감추기 원본 스펙 유지) -->
             <div class="bg-[#101b2b] border-2 border-[#223956] rounded-2xl p-6 space-y-5 shadow-xl h-fit">
                 <div class="flex justify-between items-center border-b border-[#223956] pb-3">
                     <h2 class="text-xl font-black text-[#e0a96d]">⚙️ 수사망 통제 설정</h2>
-                    <!-- 🔥 학생들이 볼 수 없도록 숨기는 보안 버튼 -->
                     <button onclick="toggleSetupVisibility()" id="btn-toggle-setup" class="bg-[#1b2b42] text-xs text-[#e0a96d] px-3 py-1.5 rounded-lg font-bold border border-[#e0a96d]/30 cursor-pointer">👁️ 설정창 숨기기</button>
                 </div>
                 
@@ -55,8 +66,6 @@
                     </div>
 
                     <button onclick="generateGameData()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-black py-4 rounded-xl transition-all text-sm cursor-pointer shadow-md active:scale-95">🎲 사건 유포 및 역할 배분</button>
-                    
-                    <!-- 🔥 새로 추가된 서버 전체 리셋 버튼 -->
                     <button onclick="resetServerAll()" class="w-full bg-slate-800 hover:bg-slate-700 text-gray-300 font-bold py-2.5 rounded-xl text-xs cursor-pointer border border-gray-600 active:scale-95">🔄 서버 전체 데이터 초기화(RESET)</button>
                 </div>
 
@@ -66,18 +75,20 @@
                 </div>
             </div>
 
-            <!-- 2. 실시간 투표 정산 상황판 (글자 대형 확대 패치) -->
+            <!-- 2. 🔥 [교사용 핵심 변혁] 4명씩 2줄(4x2) 격자 배치 실시간 캐릭터 상황판 -->
             <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-6 flex flex-col lg:col-span-2 shadow-xl">
                 <h2 class="text-xl lg:text-2xl font-black text-[#e0a96d] mb-5 flex items-center border-b border-[#223956] pb-3">
-                    <span class="w-3 h-3 rounded-full bg-red-600 mr-2.5 animate-ping"></span> Realtime: 용의선상 실시간 고발 저울 그래프
+                    <span class="w-3 h-3 rounded-full bg-red-600 mr-2.5 animate-ping"></span> Realtime: 용의선상 실시간 고발 캐릭터 배치 상황판
                 </h2>
-                <div id="chart-container" class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-2">
-                    <p class="text-base text-gray-500 italic text-center py-20 font-bold">클래스 수사망 가동 후 학생들이 단서를 제출하기 시작하면 실시간 데이터 정산이 시작됩니다.</p>
+                
+                <!-- 4열 종대 배치 레이아웃 (최대 8명 타겟 구조화) -->
+                <div id="chart-container" class="grid grid-cols-4 gap-4 flex-1">
+                    <p class="col-span-4 text-xl text-gray-500 italic text-center py-24 font-bold">클래스 수사망 가동 후 학생들이 단서를 제출하기 시작하면 실시간 캐릭터 정산이 작동합니다.</p>
                 </div>
             </div>
         </div>
 
-        <!-- 3. 야간 즉결 재판 패널 (글자 대형 확대 패치) -->
+        <!-- 3. 야간 즉결 재판 패널 -->
         <div id="court-panel" class="bg-[#101b2b] border-4 border-red-900/60 rounded-3xl p-8 hidden space-y-6 shadow-2xl">
             <div class="text-center">
                 <span class="bg-red-950 text-red-400 text-sm font-black px-5 py-2 rounded-full border border-red-900/40 font-orbitron">NIGHT COURT SYSTEM</span>
@@ -101,6 +112,14 @@
         let courtVotesData = {}; 
         let currentSuspectList = [];
         let timerInterval = null;
+
+        // 벡터 기반 코난 미스테리 실루엣 캐릭터 SVG 풀
+        const svgTeacherPool = [
+            `<svg viewBox="0 0 24 24" class="w-20 h-24 text-slate-500 mx-auto" fill="currentColor"><path d="M12 2A4 4 0 0 0 8 6a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4M4 20v2h16v-2c0-2.66-5.33-4-8-4s-8 1.34-8 4z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-20 h-24 text-slate-600 mx-auto" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-20 h-24 text-zinc-500 mx-auto" fill="currentColor"><path d="M12 2A3 3 0 0 0 9 5a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m-4.5 6c-.83 0-1.5.67-1.5 1.5V14c0 .83.67 1.5 1.5 1.5h1v6h3v-6h1v6h3v-6h1c.83 0 1.5-.67 1.5-1.5V9.5c0-.83-.67-1.5-1.5-1.5h-9z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-20 h-24 text-neutral-600 mx-auto" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a5 5 0 0 0-5-5M6 22h12v-2c0-3-4.5-4.5-6-4.5s-6 1.5-6 4.5v2z"/></svg>`
+        ];
 
         db.ref('students').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -148,7 +167,7 @@
         }
 
         function resetServerAll() {
-            if(!confirm("서버의 모든 게임 데이터를 초기화하시겠습니까? 학생 기기도 전부 로그아웃됩니다.")) return;
+            if(!confirm("서查의 모든 게임 데이터를 초기화하시겠습니까? 학생 기기도 전부 로그아웃됩니다.")) return;
             clearInterval(timerInterval);
             db.ref('/').set({
                 students: {},
@@ -159,7 +178,7 @@
                 globalTimer: "05:00",
                 signal: "RESET_ALL"
             });
-            document.getElementById('chart-container').innerHTML = `<p class="text-base text-gray-500 italic text-center py-20 font-bold">서버 데이터가 완전히 리셋되었습니다.</p>`;
+            document.getElementById('chart-container').innerHTML = `<p class="text-xl text-gray-500 italic text-center py-20 font-bold">서버 데이터가 완전히 리셋되었습니다.</p>`;
             alert("서버 완전 리셋 완료!");
         }
 
@@ -171,7 +190,6 @@
 
             if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
 
-            // 고정 단서 목록 풀 (내부 자동 매칭용으로 안전하게 고정)
             const grades = ["1학년", "2학년", "3학년"];
             const hobbies = ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"];
             const skills = ["축구", "탁구", "농구"];
@@ -210,7 +228,7 @@
                 globalTimer: "05:00",
                 signal: "INIT"
             });
-            alert(`수사망 가동 완료! 인원 세팅에 맞춰 역할이 분배되었습니다.`);
+            alert(`수사망 가동 완료! 인원 세팅에 맞춰 역할이 배분되었습니다.`);
         }
 
         function startTimer() {
@@ -239,36 +257,58 @@
             });
         }
 
+        // 🔥 [교사용 리인벤트 핵심] 4x2 격자 배열 대형 캐릭터 대시보드 정산 드로잉 함수
         function renderChart() {
             recalculateVotedCounts();
             const container = document.getElementById('chart-container');
             container.innerHTML = "";
+            
             const list = Object.values(gameState.students);
             if(list.length === 0) return;
 
-            list.sort((a,b) => b.votedCount - a.votedCount);
-            const max = Math.max(...list.map(s => s.votedCount), 1);
+            // 이름순 정렬 혹은 8개 고정 한계치 가이드 보정
+            let visibleList = [...list];
+            if(visibleList.length > 8) visibleList = visibleList.slice(0, 8);
 
-            list.forEach(s => {
-                const pct = (s.votedCount / max) * 100;
+            visibleList.forEach((s, idx) => {
+                const svgIcon = svgTeacherPool[idx % svgTeacherPool.length];
+                
+                // 표를 1표 이상 받으면 붉은 타겟 이펙트 활성화
+                const hasVotes = s.votedCount > 0 && s.isAlive;
+                
                 let statusBadge = s.isAlive 
-                    ? `<span class="text-emerald-400 font-extrabold text-xs lg:text-sm bg-emerald-950/50 px-3 py-1 rounded border border-emerald-800">🟢 추리 추적 중</span>` 
-                    : `<span class="text-red-500 font-extrabold text-xs lg:text-sm bg-red-950/50 px-3 py-1 rounded border border-red-900 line-through">💀 CASE OUT (탈락)</span>`;
+                    ? `<span class="text-emerald-400 font-extrabold text-xs bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800">🟢 생존</span>` 
+                    : `<span class="text-red-500 font-extrabold text-xs bg-red-950/50 px-2 py-0.5 rounded border border-red-900 line-through">💀 탈락</span>`;
 
-                container.innerHTML += `
-                    <div class="space-y-2 bg-[#05090f]/75 p-4 rounded-2xl border-2 border-[#223956]/60">
-                        <div class="flex justify-between items-center font-black">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-white text-xl lg:text-2xl">${s.name}</span>
-                                ${statusBadge}
-                            </div>
-                            <span class="text-red-400 font-orbitron text-lg lg:text-xl">${s.votedCount} 표 누적</span>
+                const cardHtml = `
+                    <div class="bg-[#05090f]/75 border-2 border-[#223956]/80 rounded-2xl p-4 flex flex-col items-center justify-between min-h-[190px] shadow-lg text-center relative transition-all ${hasVotes ? 'suspect-target-glow' : ''}">
+                        <!-- 최상단 서바이벌 배지 -->
+                        <div class="absolute top-2 left-2">${statusBadge}</div>
+                        
+                        <!-- 중앙 대형 캐릭터 그래픽 -->
+                        <div class="w-full flex-1 flex items-center justify-center pt-4">
+                            ${svgIcon}
                         </div>
-                        <div class="w-full bg-[#05090f] h-4 rounded-full overflow-hidden border-2 border-[#223956]">
-                            <div class="bg-gradient-to-r from-red-600 to-[#e0a96d] h-full" style="width: ${s.isAlive ? pct : 0}%"></div>
+                        
+                        <!-- 하단 대형 이름 및 누적 표수 표시 -->
+                        <div class="w-full border-t border-[#223956] pt-2 mt-2 space-y-1">
+                            <span class="text-white text-xl font-black block">${s.name}</span>
+                            <span class="font-orbitron text-base font-black ${hasVotes ? 'text-red-500' : 'text-gray-400'} block">
+                                🎯 ${s.votedCount} 표 누적
+                            </span>
                         </div>
-                    </div>`;
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
             });
+            
+            // 만약 등록된 학생 수가 4명 이하라 2줄이 안 찰 때 레이아웃 찌그러짐 방지 더미 채우기 보정
+            if (visibleList.length > 0 && visibleList.length < 8) {
+                const dummyCount = 8 - visibleList.length;
+                for (let i = 0; i < dummyCount; i++) {
+                    container.innerHTML += `<div class="bg-[#05090f]/20 border border-[#223956]/20 rounded-2xl p-4 min-h-[190px] border-dashed flex items-center justify-center text-gray-700 font-bold text-xs">수사망 공석</div>`;
+                }
+            }
         }
 
         function extractAllSuspects() {
