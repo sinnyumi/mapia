@@ -22,9 +22,15 @@
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e0a96d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
-            background-position: right 0.8rem center;
+            background-position: right 0.6rem center;
             background-size: 1.1em;
             padding-right: 2rem !important;
+        }
+        /* 캐릭터 카드 선택 시 코난 타겟 크로스헤어 느낌의 애니메이션 경계선 */
+        .char-card-selected {
+            border-color: #ef4444 !important;
+            background-color: rgba(239, 68, 68, 0.15) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
         }
     </style>
 </head>
@@ -52,19 +58,17 @@
             </div>
         </div>
 
-        <!-- 2단계: 모바일 화면을 꽉 채우는 지문인식 스캐너 패드 -->
+        <!-- 2단계: 지문인식 스캐너 패드 -->
         <div id="step-scanner" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-4 hidden flex-1 flex flex-col items-center justify-between min-h-[80vh] shadow-2xl w-full">
             <div class="text-center pt-2">
                 <h2 class="text-xl font-black text-[#e0a96d] font-orbitron tracking-wider">TARGET TRACKING</h2>
                 <p class="text-xs text-[#adbac7]">정체 식별을 위해 지문 모양을 <span class="text-red-400 font-bold underline">3초간 꾹 누르세요.</span></p>
             </div>
             
-            <!-- 🔥 화면 가득 차는 대형 리얼 지문 아이콘 패드 개조 -->
             <div id="touch-zone" class="relative w-full flex-1 max-h-[55vh] bg-[#05090f] border-2 border-[#e0a96d]/30 rounded-2xl flex items-center justify-center cursor-pointer select-none overflow-hidden my-4 active:border-[#e0a96d]">
                 <div id="laser" class="absolute left-0 w-full h-1.5 bg-[#e0a96d] shadow-[0_0_20px_#e0a96d] hidden scanner-line z-10"></div>
                 <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-[#e0a96d]/15 transition-all duration-75" style="height: 0%;"></div>
                 
-                <!-- 대형 리얼 지문 형상 SVG 백그라운드 매칭 -->
                 <svg class="w-56 h-64 text-[#e0a96d] opacity-50 transition-opacity active:opacity-90" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A1.5,1.5 0 0,1 13.5,5.5A1.5,1.5 0 0,1 12,7A1.5,1.5 0 0,1 10.5,5.5A1.5,1.5 0 0,1 12,4M12,18A6,6 0 0,1 6,12A1.5,1.5 0 0,1 7.5,10.5A1.5,1.5 0 0,1 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A1.5,1.5 0 0,1 16.5,10.5A1.5,1.5 0 0,1 18,12A6,6 0 0,1 12,18M12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14M12,8A4,4 0 0,1 16,12A1.5,1.5 0 0,1 14.5,13.5A1.5,1.5 0 0,1 13,12A1.5,1.5 0 0,0 11.5,10.5A1.5,1.5 0 0,0 10,12A1.5,1.5 0 0,1 8.5,13.5A1.5,1.5 0 0,1 7,12A4,4 0 0,1 12,8Z"/>
                 </svg>
@@ -81,11 +85,10 @@
             <h2 class="text-2xl font-black text-white tracking-widest animate-pulse">사건 파일 매칭 중...</h2>
         </div>
 
-        <!-- 4단계: 정체 최초 확인 창 (초대형 텍스트 크기 강화 패치) -->
+        <!-- 4단계: 정체 최초 확인 창 -->
         <div id="step-reveal" class="bg-[#101b2b] border-2 border-red-900/50 rounded-3xl p-5 hidden space-y-5 shadow-2xl">
             <div class="text-center space-y-2">
-                <!-- 🔥 역할 텍스트(경찰, 마피아 등) 크기를 극대화함 -->
-                <h2 id="role-title" class="text-3xl font-black px-6 py-4 rounded-2xl inline-block font-orbitron tracking-wide shadow-2xl border-2">🚨 프로필 로드</h2>
+                <h2 id="role-title" class="text-2xl font-black px-6 py-4 rounded-2xl inline-block font-orbitron tracking-wide shadow-2xl border-2">🚨 프로필 로드</h2>
                 <p class="text-sm text-red-500 font-black animate-pulse">⚠️ 주의: 역할이 노출되지 않게 한 손으로 가리세요!</p>
             </div>
             
@@ -102,17 +105,18 @@
             <button onclick="goInvestigation()" class="w-full bg-gradient-to-r from-[#e0a96d] to-[#b8860b] text-slate-900 font-black py-4 rounded-2xl text-base shadow-lg cursor-pointer">🕶️ 정체 확인 완료 (화면 감추기)</button>
         </div>
 
-        <!-- 5단계: 모달형 세로 수사 기록지 -->
+        <!-- 5단계: 세로 수사 기록지 (캐릭터판 변혁 완료) -->
         <div id="step-sheet" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-4 hidden space-y-5 shadow-2xl">
             <div class="border-b border-[#223956] pb-2 flex justify-between items-center">
                 <h1 class="text-base font-black text-white tracking-tight flex items-center">🔎 명탐정 수사기록지</h1>
                 <span id="display-my-name" class="text-xs bg-[#090e15] text-[#e0a96d] font-black px-3 py-1 rounded-lg border border-[#223956]"></span>
             </div>
 
+            <!-- 수사 메모부 -->
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xs font-black text-gray-300 tracking-wider flex items-center">
-                        <span class="w-1.5 h-1.5 rounded-full bg-[#e0a96d] mr-1.5"></span> [활동 1] 알리바이 추리 메모 (3명)
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#e0a96d] mr-1.5"></span> [활동 1] 알리바이 추리 메모 (최대 8명 조율)
                     </h2>
                     <button onclick="addInterviewCard()" class="bg-[#1b2b42] text-[#e0a96d] font-black px-2.5 py-1.5 rounded-xl text-[11px] border border-[#223956] cursor-pointer">
                         + 용의자 추가
@@ -121,11 +125,14 @@
                 <div id="interview-card-container" class="space-y-3"></div>
             </div>
 
-            <div class="bg-[#090e15] p-4 rounded-2xl border border-[#223956] space-y-3">
+            <!-- 🔥 [대수술] 4명 / 4명 총 8인용 캐릭터 격자 선택판 -->
+            <div class="bg-[#090e15] p-3.5 rounded-2xl border border-[#223956] space-y-3">
                 <h3 class="text-xs font-black text-red-400 flex items-center">
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5"></span> [활동 2] 마피아 지목 최종 투표 (1~3명)
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5"></span> [활동 2] 마피아 캐릭터 즉결 지목 (최대 3명 터치 선택)
                 </h3>
-                <div id="vote-checkboxes" class="grid grid-cols-2 gap-2 pt-0.5"></div>
+                
+                <!-- 4열 종대 배열 격자 컨테이너 (모바일 가득 채우기) -->
+                <div id="vote-[#e0a96d]-grid" class="grid grid-cols-4 gap-2 pt-1"></div>
             </div>
 
             <button onclick="submitInvestigation()" class="w-full bg-gradient-to-r from-[#9b1c1c] to-[#bd2c2c] text-white font-black py-4 rounded-2xl text-base shadow-xl cursor-pointer">🎯 수사 자료 제출 (제출 완료)</button>
@@ -173,6 +180,17 @@
         let courtSuspectsQueue = []; 
         let currentQueueIndex = 0;
         let cluesPool = { grade: [], hobby: [], skill: [], job: [] };
+        
+        // 투표용 실시간 배열 타겟 바인딩
+        let selectedSuspects = [];
+
+        // SVG 기반 범인 실시간 벡터 캐릭터 리스트 풀 (코난 범인 그래픽화)
+        const svgCharacterPool = [
+            `<svg viewBox="0 0 24 24" class="w-10 h-12 text-slate-400 mx-auto" fill="currentColor"><path d="M12 2A4 4 0 0 0 8 6a4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4M4 20v2h16v-2c0-2.66-5.33-4-8-4s-8 1.34-8 4z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-10 h-12 text-slate-500 mx-auto" fill="currentColor"><path d="M12 2c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m9 7h-6v13h-2v-6h-2v6H9V9H3V7h18v2z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-10 h-12 text-zinc-400 mx-auto" fill="currentColor"><path d="M12 2A3 3 0 0 0 9 5a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m-4.5 6c-.83 0-1.5.67-1.5 1.5V14c0 .83.67 1.5 1.5 1.5h1v6h3v-6h1v6h3v-6h1c.83 0 1.5-.67 1.5-1.5V9.5c0-.83-.67-1.5-1.5-1.5h-9z"/></svg>`,
+            `<svg viewBox="0 0 24 24" class="w-10 h-12 text-neutral-500 mx-auto" fill="currentColor"><path d="M12 2a5 5 0 0 0-5 5v3a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a5 5 0 0 0-5-5M6 22h12v-2c0-3-4.5-4.5-6-4.5s-6 1.5-6 4.5v2z"/></svg>`
+        ];
 
         db.ref('students').on('value', (snapshot) => {
             studentsPool = snapshot.val() || {};
@@ -202,10 +220,7 @@
                 document.getElementById('modal-court').classList.add('hidden');
                 rebuildInterviewSheet();
             }
-            if(sig === 'RESET_ALL') {
-                // 원격 강제 로그아웃 리셋 처리
-                location.reload();
-            }
+            if(sig === 'RESET_ALL') location.reload();
         });
 
         db.ref('globalTimer').on('value', (snapshot) => {
@@ -214,7 +229,7 @@
 
         function login() {
             myName = document.getElementById('student-name').value.trim();
-            if(!myName || !studentsPool[myName]) { alert("등록되지 않은 이름입니다. 교사 대시보드에 이름이 올바르게 등록되었는지 확인하세요!"); return; }
+            if(!myName || !studentsPool[myName]) { alert("등록되지 않은 이름입니다. 교사 제어판을 먼저 가동해 주세요."); return; }
             
             myData = studentsPool[myName];
             if(!myData.isAlive) { document.getElementById('modal-dead').classList.remove('hidden'); return; }
@@ -227,8 +242,6 @@
         function bindScannerEvents() {
             const zone = document.getElementById('touch-zone');
             zone.onmousedown = startScan; zone.onmouseup = stopScan; zone.onmouseleave = stopScan;
-            
-            // 모바일 터치이벤트 대응
             zone.ontouchstart = (e) => { e.preventDefault(); startScan(); }; 
             zone.ontouchend = (e) => { e.preventDefault(); stopScan(); };
         }
@@ -236,7 +249,6 @@
         function startScan() {
             document.getElementById('laser').classList.remove('hidden');
             document.getElementById('scan-status').innerText = "알리바이 데이터 코드 스캔 중...";
-            document.getElementById('scan-status').className = "text-xs font-black text-[#e0a96d] animate-pulse";
             scanInterval = setInterval(() => {
                 scanProgress += 5; document.getElementById('progress-bar').style.height = `${scanProgress}%`;
                 if(scanProgress >= 100) { clearInterval(scanInterval); triggerBuildup(); }
@@ -248,8 +260,7 @@
                 clearInterval(scanInterval); scanProgress = 0;
                 document.getElementById('progress-bar').style.height = `0%`;
                 document.getElementById('laser').classList.add('hidden');
-                document.getElementById('scan-status').innerText = "스캔 실패! 화면 중앙 지문을 꾹 유지하세요.";
-                document.getElementById('scan-status').className = "text-xs font-bold text-red-500 animate-bounce";
+                document.getElementById('scan-status').innerText = "스캔 실패! 지문을 유지하세요.";
             }
         }
 
@@ -268,19 +279,18 @@
                 const title = document.getElementById('role-title');
                 const tip = document.getElementById('role-tip');
 
-                // 🔥 [역할 표시 폰트 초대형 강화 패치]
                 if(myData.role === "마피아") {
                     title.innerText = "🚨 당신은 마피아입니다";
-                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-red-950 to-red-950 text-red-500 border-4 border-red-600 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
-                    tip.innerHTML = "교실을 탐색하며 소통할 때, 당신의 수사 파일 정보 중 <strong class='text-red-400 underline'>딱 1개만 위조(거짓말)</strong>하여 대답해야 합니다. 다른 명탐정 수사관들의 추리를 기만하세요!";
+                    title.className = "text-2xl font-black bg-gradient-to-r from-red-950 to-red-950 text-red-500 border-4 border-red-600 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
+                    tip.innerHTML = "당신의 수사 파일 정보 중 <strong class='text-red-400 underline'>딱 1개만 위조(거짓말)</strong>하여 대답해야 합니다.";
                 } else if(myData.role === "경찰") {
                     title.innerText = "⚡ 당신은 경찰입니다";
-                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-cyan-950 to-cyan-950 text-cyan-400 border-4 border-cyan-500 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
-                    tip.innerHTML = "당신은 무조건 <strong class='text-cyan-400'>100% 진실만을 답변</strong>해야 합니다. 동료 시민수사관들과 협력해 가짜 알리바이를 유포하는 스파이를 잡으세요.";
+                    title.className = "text-2xl font-black bg-gradient-to-r from-cyan-950 to-cyan-950 text-cyan-400 border-4 border-cyan-500 px-6 py-4 rounded-2xl shadow-2xl animate-pulse";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-cyan-400'>100% 진실만을 답변</strong>해야 합니다.";
                 } else {
                     title.innerText = "👥 당신은 시민입니다";
-                    title.className = "text-2xl lg:text-3xl font-black bg-gradient-to-r from-emerald-950 to-emerald-950 text-emerald-400 border-4 border-emerald-500 px-6 py-4 rounded-2xl shadow-2xl";
-                    tip.innerHTML = "당신은 무조건 <strong class='text-emerald-400'>100% 진실만을 답변</strong>해야 합니다. 대화 릴레이를 통해 가짜 알리바이를 유포하고 다니는 범인을 찾아내세요.";
+                    title.className = "text-2xl font-black bg-gradient-to-r from-emerald-950 to-emerald-950 text-emerald-400 border-4 border-emerald-500 px-6 py-4 rounded-2xl shadow-2xl";
+                    tip.innerHTML = "당신은 무조건 <strong class='text-emerald-400'>100% 진실만을 답변</strong>해야 합니다.";
                 }
             }, 2000);
         }
@@ -290,6 +300,7 @@
             document.getElementById('step-reveal').innerHTML = ""; 
             document.getElementById('step-reveal').classList.add('hidden');
             document.getElementById('step-sheet').classList.remove('hidden');
+            selectedSuspects = [];
             rebuildInterviewSheet();
         }
 
@@ -297,11 +308,16 @@
             const container = document.getElementById('interview-card-container'); 
             container.innerHTML = "";
             for(let i=0; i<3; i++) { addInterviewCard(); }
-            renderCheckboxes();
+            renderCharacterGrid();
         }
 
         function addInterviewCard() {
             const container = document.getElementById('interview-card-container');
+            
+            // 용의자 총 카드 수 한계치 조율 (최대 8명까지만 카드 생성 허용 보정)
+            const currentCards = container.querySelectorAll('.target-name').length;
+            if(currentCards >= 8) { alert("추리 수첩 메모는 최대 8명까지만 기입 가능합니다."); return; }
+
             let studentOpts = `<option value="">용의자 이름 선택</option>`;
             Object.keys(studentsPool).forEach(k => {
                 if(k !== myName) {
@@ -316,7 +332,7 @@
             card.innerHTML = `
                 <div class="flex items-center space-x-2 border-b border-[#223956] pb-1.5">
                     <span class="text-[#e0a96d] font-black">👤 대상:</span>
-                    <select onchange="renderCheckboxes()" class="bg-[#142337] border border-[#223956] rounded-lg p-2 flex-1 text-white font-bold text-xs focus:outline-none target-name">${studentOpts}</select>
+                    <select onchange="renderCharacterGrid()" class="bg-[#142337] border border-[#223956] rounded-lg p-2 flex-1 text-white font-bold text-xs focus:outline-none target-name">${studentOpts}</select>
                 </div>
                 <div class="grid grid-cols-2 gap-2 pt-0.5 text-gray-300">
                     <div class="flex items-center space-x-1">
@@ -340,43 +356,85 @@
             container.appendChild(card);
         }
 
-        function renderCheckboxes() {
-            const container = document.getElementById('vote-checkboxes'); container.innerHTML = "";
+        // 🔥 [대수술 핵심] 테이블/체크박스를 없애고 실제 캐릭터 카드를 4명 / 4명 가로 배열 렌더링하는 함수
+        function renderCharacterGrid() {
+            const container = document.getElementById('vote-[#e0a96d]-grid'); 
+            container.innerHTML = "";
+            
             const targets = document.querySelectorAll('.target-name');
-            let set = new Set(); targets.forEach(t => { if(t.value) set.add(t.value); });
+            let uniqueNames = new Set(); 
+            targets.forEach(t => { if(t.value) uniqueNames.add(t.value); });
 
-            let validCount = 0;
-            set.forEach(name => {
+            let validSuspects = [];
+            uniqueNames.forEach(name => {
                 if(studentsPool[name] && studentsPool[name].isAlive) {
-                    validCount++;
-                    container.innerHTML += `
-                        <label class="flex items-center space-x-2 bg-[#142337] p-3 rounded-xl border border-[#223956] hover:border-[#e0a96d]/50 transition-all cursor-pointer select-none">
-                            <input type="checkbox" value="${name}" class="w-4 h-4 text-red-600 bg-[#090e15] border-[#223956] rounded focus:ring-red-500 v-box" onchange="limitCheck(this)">
-                            <span class="text-xs font-black text-white">${name}</span>
-                        </label>`;
+                    validSuspects.push(name);
                 }
             });
-            if(validCount === 0) container.innerHTML = `<p class="col-span-2 text-[11px] text-gray-500 italic text-center py-2 w-full">추리한 대상 명단이 비어 있습니다.</p>`;
+
+            // 최대 8명 스펙 가이드 보정 (초과분 자르기)
+            if(validSuspects.length > 8) validSuspects = validSuspects.slice(0, 8);
+
+            // 선택 배열 보정 (사라진 이름 필터)
+            selectedSuspects = selectedSuspects.filter(n => validSuspects.includes(n));
+
+            if(validSuspects.length === 0) {
+                container.innerHTML = `<p class="col-span-4 text-center text-gray-500 italic text-[11px] py-4 w-full">상단 수첩 메모창에 용의자를 기입하면 여기에 캐릭터 카드가 자동으로 생성됩니다.</p>`;
+                return;
+            }
+
+            // 4명씩 끊어서 4명, 4명 정렬 형태로 카드 덤프 생성
+            validSuspects.forEach((name, idx) => {
+                // 인덱스별로 범인 실시간 그래픽 룩앤필 매칭
+                const svgIcon = svgCharacterPool[idx % svgCharacterPool.length];
+                const isSelected = selectedSuspects.includes(name);
+                
+                const cardHtml = `
+                    <div onclick="toggleCharacterSelect('${name}')" id="char-card-${name}" class="bg-[#142337] border-2 border-[#223956] rounded-xl p-2 text-center cursor-pointer transition-all flex flex-col justify-between items-center space-y-1 min-h-[90px] ${isSelected ? 'char-card-selected' : ''}">
+                        <div class="w-full flex-1 flex items-center justify-center">
+                            ${svgIcon}
+                        </div>
+                        <span class="text-[11px] font-black text-white block truncate w-full border-t border-[#223956]/40 pt-1 leading-tight">${name}</span>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
         }
 
-        function limitCheck(el) {
-            const checked = document.querySelectorAll('.v-box:checked');
-            if(checked.length > 3) { alert("의심 용의자는 한 번에 최대 3명까지만 선택 가능합니다."); el.checked = false; }
+        // 캐릭터 카드 터치 제어 및 최대 3명 락 토글 함수
+        function toggleCharacterSelect(name) {
+            const idx = selectedSuspects.indexOf(name);
+            const cardEl = document.getElementById(`char-card-${name}`);
+            
+            if (idx > -1) {
+                // 이미 고른 경우 제거
+                selectedSuspects.splice(idx, 1);
+                if(cardEl) cardEl.classList.remove('char-card-selected');
+            } else {
+                // 새로 고르는 경우 3명 제한 체크
+                if(selectedSuspects.length >= 3) {
+                    alert("마피아 용의자는 한 번에 최대 3명까지만 동시 고발 가능합니다.");
+                    return;
+                }
+                selectedSuspects.push(name);
+                if(cardEl) cardEl.classList.add('char-card-selected');
+            }
         }
 
         function submitInvestigation() {
-            const checked = document.querySelectorAll('.v-box:checked');
             const targetSelects = document.querySelectorAll('.target-name');
-            
             let nameFilled = 0;
             targetSelects.forEach(s => { if(s.value) nameFilled++; });
 
-            if(nameFilled < 3 || checked.length < 1) { alert("최소 3명 이상의 수사 메모 정보를 입력하고 최종 하단 범인 용의자를 선택하셔야 제출이 가능합니다!"); return; }
-            let votes = []; checked.forEach(cb => votes.push(cb.value));
+            if(nameFilled < 3 || selectedSuspects.length < 1) { 
+                alert("최소 3명 이상의 추리 기록을 작성하고 하단 캐릭터 카드 중에서 의심되는 용의자를 1명 이상 터치하여 선택하셔야 합니다!"); 
+                return; 
+            }
             
-            db.ref(`rawVotes/${myName}`).set(votes);
-            checked.forEach(cb => cb.checked = false);
-            alert("수사 파일이 성공적으로 제출되었습니다! 교단 화면을 확인해 주세요.");
+            db.ref(`rawVotes/${myName}`).set(selectedSuspects);
+            selectedSuspects = [];
+            document.querySelectorAll('.char-card-selected').forEach(el => el.classList.remove('char-card-selected'));
+            alert("수사 정보 및 지목 캐릭터 정보가 교사 대시보드로 실시간 안전 전송되었습니다!");
         }
 
         function initSequentialCourt(suspectRawString) {
