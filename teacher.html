@@ -78,6 +78,112 @@
 }
 /* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 고정 */
 #chart-container img { width: 100%; height: 100%; object-fit: cover; }
+
+/* 🔒 지문 스캐너 UI */
+.fp-scanner{
+    position:relative;
+    width:100%;
+    height:100%;
+    background:radial-gradient(circle at 50% 40%, #0c1a2e 0%, #060d18 70%, #03060c 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    cursor:pointer;
+    -webkit-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+    touch-action:none;
+}
+.fp-scanner svg{
+    width:62%;
+    height:62%;
+    transition:filter .25s ease;
+    filter:drop-shadow(0 0 3px rgba(56,189,248,.25));
+}
+.fp-scanner .fp-print-path{
+    fill:none;
+    stroke:#3b5a78;
+    stroke-width:2.6;
+    stroke-linecap:round;
+    transition:stroke .25s ease;
+}
+.fp-scanner.fp-active .fp-print-path{
+    stroke:#38bdf8;
+}
+.fp-scanner.fp-success .fp-print-path{
+    stroke:#34d399;
+}
+.fp-ring{
+    position:absolute;
+    width:74%;
+    height:74%;
+    border-radius:50%;
+    border:2px solid rgba(56,189,248,.25);
+    opacity:0;
+    transition:opacity .2s ease;
+}
+.fp-scanner.fp-active .fp-ring{
+    opacity:1;
+    animation:fp-pulse-ring 1.4s ease-in-out infinite;
+}
+@keyframes fp-pulse-ring{
+    0%,100%{ transform:scale(1); border-color:rgba(56,189,248,.2); }
+    50%{ transform:scale(1.06); border-color:rgba(56,189,248,.55); }
+}
+.fp-scanline{
+    position:absolute;
+    left:8%;
+    width:84%;
+    height:3px;
+    background:linear-gradient(90deg, transparent, #5eead4 20%, #5eead4 80%, transparent);
+    box-shadow:0 0 10px 2px rgba(94,234,212,.8);
+    top:13%;
+    opacity:0;
+    pointer-events:none;
+}
+.fp-scanner.fp-active .fp-scanline{
+    opacity:1;
+    animation:fp-scan-move 1.15s ease-in-out infinite;
+}
+@keyframes fp-scan-move{
+    0%{ top:13%; }
+    50%{ top:84%; }
+    100%{ top:13%; }
+}
+.fp-progress-wrap{
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:8px;
+    background:rgba(0,0,0,.45);
+}
+.fp-progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#0ea5e9,#38bdf8,#5eead4);
+    box-shadow:0 0 8px rgba(56,189,248,.7);
+}
+.fp-progress-bar.fp-animate{
+    transition:width 2.3s linear;
+}
+.fp-status-label{
+    position:absolute;
+    bottom:12px;
+    left:0;
+    width:100%;
+    text-align:center;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+    color:#7dd3fc;
+    text-shadow:0 0 6px rgba(56,189,248,.8);
+    pointer-events:none;
+}
+.fp-scanner.fp-success .fp-status-label{ color:#6ee7b7; text-shadow:0 0 6px rgba(110,231,183,.8); }
+.fp-scanner.fp-success .fp-ring{ opacity:1; border-color:rgba(52,211,153,.6); animation:none; }
+.fp-scanner.fp-success .fp-scanline{ opacity:0; }
     </style>
 </head>
 <body class="min-h-screen p-6 flex flex-col items-center">
@@ -410,7 +516,13 @@ function generateGameData() {
         const list = Object.values(gameState.students);
         if(list.length === 0) return;
 
-        const visibleList = list;
+        // 🔍 한 표 이상 지목된, 즉 "용의자"로 몰린 학생만 브리핑 보드에 노출
+        const visibleList = list.filter(s => s.votedCount > 0);
+
+        if (visibleList.length === 0) {
+            container.innerHTML = `<p class="col-span-2 sm:col-span-4 text-base text-gray-500 italic text-center py-20 font-bold">아직 지목된 용의자가 없습니다.<br>학생들의 알리바이 수사 제출을 기다리는 중...</p>`;
+            return;
+        }
 
         visibleList.forEach((s, idx) => {
             const suspicion = Math.min(100, s.votedCount * 25);
@@ -422,8 +534,23 @@ function generateGameData() {
                 <div class="bg-[#efe5cf] border-4 border-[#b08a42] rounded-xl overflow-hidden shadow-2xl relative flex flex-col h-full">
                     <div class="absolute top-1.5 left-1.5 z-20">${statusBadge}</div>
                     <div class="absolute top-1.5 right-1.5 bg-red-800 text-white font-black text-[10px] px-2 py-0.5 rounded rotate-12 z-20">WANTED</div>
-                    <div class="w-full aspect-[3/4] bg-[#efe5cf] overflow-hidden">
-                        <img src="https://raw.githubusercontent.com/sinnyumi/mapia/main/%EB%B2%94%EC%9D%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png" alt="범인 이미지" class="w-full h-full object-cover">
+                    <div class="w-full aspect-[3/4] overflow-hidden">
+                        <div class="fp-scanner" data-name="${s.name}">
+                            <div class="fp-ring"></div>
+                            <div class="fp-scanline"></div>
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <path class="fp-print-path" d="M50 15 C30 15 18 30 18 48 C18 64 26 76 36 84"/>
+                                <path class="fp-print-path" d="M50 20 C34 20 24 33 24 48 C24 60 30 70 38 78"/>
+                                <path class="fp-print-path" d="M50 25 C38 25 30 36 30 48 C30 58 35 66 41 72"/>
+                                <path class="fp-print-path" d="M50 30 C42 30 36 39 36 48 C36 55 39 61 44 66"/>
+                                <path class="fp-print-path" d="M50 35 C45 35 42 41 42 48 C42 53 44 57 47 60"/>
+                                <path class="fp-print-path" d="M58 18 C70 22 78 34 78 48 C78 62 70 74 58 80"/>
+                                <path class="fp-print-path" d="M58 26 C66 29 72 38 72 48 C72 58 66 67 58 72"/>
+                                <path class="fp-print-path" d="M58 34 C63 37 66 42 66 48 C66 54 63 59 58 63"/>
+                            </svg>
+                            <span class="fp-status-label">손가락을 길게 눌러 스캔</span>
+                            <div class="fp-progress-wrap"><div class="fp-progress-bar"></div></div>
+                        </div>
                     </div>
                     <div class="bg-[#f8f1df] px-3 py-2.5 text-center border-t border-[#d4c2a1] flex-1 flex flex-col justify-center gap-1.5 min-h-0">
                         <div class="text-[#111827] text-base font-black truncate">${s.name}</div>
@@ -439,6 +566,7 @@ function generateGameData() {
             `;
         });
 
+        initFingerprintScanners();
     }
 
     function extractAllSuspects() {
@@ -481,6 +609,70 @@ function generateGameData() {
                         <div class="bg-gradient-to-r from-[#1b2b42] to-[#223956]" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
                     </div>
                 </div>`;
+        });
+    }
+
+    // 🔒 지문 스캔 인터랙션: 길게 눌러야 진행, 떼면 즉시 초기화, 2.3초간 진행 후 성공 처리
+    const FP_SCAN_DURATION = 2300; // ms
+
+    function initFingerprintScanners() {
+        document.querySelectorAll('.fp-scanner').forEach(scanner => {
+            // 이미 바인딩된 스캐너는 중복 바인딩 방지
+            if (scanner.dataset.fpBound === '1') return;
+            scanner.dataset.fpBound = '1';
+
+            let pressTimer = null;
+            let completed = false;
+            const bar = scanner.querySelector('.fp-progress-bar');
+            const label = scanner.querySelector('.fp-status-label');
+
+            const startScan = (e) => {
+                e.preventDefault();
+                if (completed) return; // 이미 성공한 카드는 재시작 없음 (필요시 release에서 리셋 가능)
+                scanner.classList.add('fp-active');
+                label.textContent = '지문 스캔 중...';
+                bar.classList.add('fp-animate');
+                // 강제 리플로우 후 진행바 채우기 (transition 적용 보장)
+                requestAnimationFrame(() => {
+                    bar.style.width = '100%';
+                });
+
+                pressTimer = setTimeout(() => {
+                    scanner.classList.remove('fp-active');
+                    scanner.classList.add('fp-success');
+                    label.textContent = '✅ 신원 확인 완료';
+                    completed = true;
+                }, FP_SCAN_DURATION);
+            };
+
+            const cancelScan = () => {
+                if (completed) return;
+                clearTimeout(pressTimer);
+                scanner.classList.remove('fp-active');
+                bar.classList.remove('fp-animate');
+                bar.style.width = '0%';
+                label.textContent = '손가락을 길게 눌러 스캔';
+            };
+
+            const resetScan = () => {
+                clearTimeout(pressTimer);
+                completed = false;
+                scanner.classList.remove('fp-active', 'fp-success');
+                bar.classList.remove('fp-animate');
+                bar.style.width = '0%';
+                label.textContent = '손가락을 길게 눌러 스캔';
+            };
+
+            scanner.addEventListener('mousedown', startScan);
+            scanner.addEventListener('touchstart', startScan, { passive: false });
+
+            scanner.addEventListener('mouseup', cancelScan);
+            scanner.addEventListener('mouseleave', cancelScan);
+            scanner.addEventListener('touchend', cancelScan);
+            scanner.addEventListener('touchcancel', cancelScan);
+
+            // 완료된 카드를 다시 눌러서 처음부터 재시도하고 싶을 때
+            scanner.addEventListener('dblclick', resetScan);
         });
     }
 
