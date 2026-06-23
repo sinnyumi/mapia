@@ -9,16 +9,62 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #090f17; color: #e2e8f0; }
-        .font-orbitron { font-family: 'Orbitron', sans-serif; }
-        .suspect-target-glow {
-            border-color: #ef4444 !important;
-            background-color: rgba(239, 68, 68, 0.15) !important;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
-            animation: pulse-border 2s infinite;
+        body{
+            font-family:'Noto Sans KR',sans-serif;
+            background:
+            radial-gradient(circle at top,
+            rgba(20,40,80,.9),
+            rgba(5,10,20,1)),
+            url('https://images.unsplash.com/photo-1503435824048-a799a3a84bf7?q=80&w=2000');
+            background-size:cover;
+            background-attachment:fixed;
+            color:#f1f5f9;
+        }
+        .case-header{
+            background:linear-gradient(
+                135deg,
+                rgba(19,33,58,.9),
+                rgba(27,43,66,.95)
+            );
+            border:3px solid #c89b3c;
+            border-radius:24px;
+            padding:20px 30px;
+            box-shadow:0 0 30px rgba(200,155,60,.2);
+        }
+        .case-header h1{
+            font-size:2.5rem;
+            font-weight:900;
+            color:#f8d36a;
+            letter-spacing:2px;
+        }
+        .case-header p{
+            color:#cbd5e1;
+            margin-top:6px;
+            font-weight:700;
+        }
+        .case-number{
+            display:inline-block;
+            background:#7f1d1d;
+            color:white;
+            padding:6px 14px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:900;
+            letter-spacing:2px;
+            margin-bottom:10px;
+        }
+        .detective-badge{
+            background:#0f172a;
+            border:2px solid #c89b3c;
+            padding:10px 18px;
+            border-radius:12px;
+            color:#f8d36a;
+            font-weight:900;
+            text-align:center;
+            margin-bottom:10px;
         }
         @keyframes pulse-border {
-            0%, 100’% { border-color: rgba(239, 68, 68, 0.5); }
+            0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
             50% { border-color: rgba(239, 68, 68, 1); }
         }
     </style>
@@ -27,12 +73,15 @@
 
     <div class="w-full max-w-7xl space-y-6">
         <div class="bg-[#101b2b] border-4 border-[#b8860b]/60 rounded-3xl p-8 flex justify-between items-center shadow-2xl">
-            <div>
-                <h1 class="text-4xl lg:text-5xl font-black text-[#e0a96d] font-orbitron tracking-widest drop-shadow-[0_0_15px_rgba(224,169,109,0.4)]">CRIMINAL INVESTIGATION HQ</h1>
-                <p class="text-sm lg:text-base text-gray-400 mt-2 font-bold">※ 교사 통제 패널에는 보안 유지 상 학생들의 실제 정체(마피아/경찰)가 노출되지 않습니다.</p>
+            <div class="case-header">
+                <div>
+                    <span class="case-number">CASE FILE #2026-001</span>
+                    <h1>🔍 명탐정 코난 수사본부</h1>
+                    <p>중국어 마피아 사건</p>
+                </div>
             </div>
             <div class="bg-[#05090f] px-8 py-4 rounded-2xl border-2 border-[#223956] text-right">
-                <span class="text-xs lg:text-sm text-[#e0a96d] block font-black tracking-wider">LIMIT TIMELINE</span>
+                <span class="text-xs lg:text-sm text-[#e0a96d] block font-black tracking-wider">사건 종료까지</span>
                 <span id="display-timer" class="text-4xl lg:text-5xl font-black font-orbitron text-white">05:00</span>
             </div>
         </div>
@@ -40,7 +89,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="bg-[#101b2b] border-2 border-[#223956] rounded-2xl p-6 space-y-5 shadow-xl h-fit">
                 <div class="flex justify-between items-center border-b border-[#223956] pb-3">
-                    <h2 class="text-xl font-black text-[#e0a96d]">⚙️ 수사망 통제 설정</h2>
+                    <h2 class="text-xl font-black text-[#e0a96d]">📂 사건 파일 설정</h2>
                     <button onclick="toggleSetupVisibility()" id="btn-toggle-setup" class="bg-[#1b2b42] text-xs text-[#e0a96d] px-3 py-1.5 rounded-lg font-bold border border-[#e0a96d]/30 cursor-pointer">👁️ 설정창 숨기기</button>
                 </div>
                 
@@ -66,25 +115,26 @@
                 </div>
 
                 <div class="border-t border-[#223956] pt-4 space-y-3">
-                    <button onclick="startTimer()" class="w-full bg-[#1b2b42] hover:bg-[#223956] text-[#e0a96d] font-black py-3.5 rounded-xl text-sm border-2 border-[#e0a96d]/30 cursor-pointer shadow-lg">⏱️ 실시간 추리 타이머 구동</button>
-                    <button onclick="extractAllSuspects()" class="w-full bg-red-950/40 hover:bg-red-900/60 text-red-400 font-black py-3.5 rounded-xl text-sm border-2 border-red-900/40 cursor-pointer shadow-lg">🔨 의심 용의자 전원 법정 기소</button>
+                    <button onclick="startTimer()" class="w-full bg-[#1b2b42] hover:bg-[#223956] text-[#e0a96d] font-black py-3.5 rounded-xl text-sm border-2 border-[#e0a96d]/30 cursor-pointer shadow-lg">⏱️ 수사 시작</button>
+                    <button onclick="extractAllSuspects()" class="w-full bg-red-950/40 hover:bg-red-900/60 text-red-400 font-black py-3.5 rounded-xl text-sm border-2 border-red-900/40 cursor-pointer shadow-lg">⚖️ 특별 재판 개시</button>
                 </div>
             </div>
 
             <div class="bg-[#101b2b] border border-[#223956] rounded-2xl p-6 flex flex-col lg:col-span-2 shadow-xl">
+                <div class="detective-badge">🕵️‍♂️ EDOGAWA CONAN</div>
                 <h2 class="text-xl lg:text-2xl font-black text-[#e0a96d] mb-5 flex items-center border-b border-[#223956] pb-3">
-                    <span class="w-3 h-3 rounded-full bg-red-600 mr-2.5 animate-ping"></span> Realtime: 용의선상 실시간 고발 캐릭터 배치 상황판
+                    <span class="w-3 h-3 rounded-full bg-red-600 mr-2.5 animate-ping"></span> 📋 사건 수사 브리핑 보드
                 </h2>
                 
                 <div id="chart-container" class="grid grid-cols-4 gap-4 flex-1">
-                    <p class="col-span-4 text-base text-gray-500 italic text-center py-20 font-bold">클래스 수사망 가동 후 학생들이 단서를 제출하기 시작하면 실시간 데이터 정산이 시작됩니다.</p>
+                    <p class="col-span-4 text-base text-gray-500 italic text-center py-20 font-bold">교실에서 수집된 증언과 알리바이 분석 결과를 실시간으로 반영합니다.</p>
                 </div>
             </div>
         </div>
 
-        <div id="court-panel" class="bg-[#101b2b] border-4 border-red-900/60 rounded-3xl p-8 hidden space-y-6 shadow-2xl">
+        <div id="court-panel" class="bg-gradient-to-b from-[#2b0d0d] to-[#120606] border-4 border-[#c89b3c] rounded-3xl p-8 hidden space-y-6 shadow-2xl">
             <div class="text-center">
-                <span class="bg-red-950 text-red-400 text-sm font-black px-5 py-2 rounded-full border border-red-900/40 font-orbitron">NIGHT COURT SYSTEM</span>
+                <span class="bg-red-950 text-red-400 text-sm font-black px-5 py-2 rounded-full border border-red-900/40 font-orbitron">⚖️ 긴급 특별 재판</span>
                 <h3 class="text-3xl font-black text-white mt-4">⚖️ 피의 기소자 배심원 투표 실시간 집계 현황</h3>
                 <p class="text-sm text-gray-400 mt-2 font-bold">학생들 기기 화면에 나타난 용의자 처형/구출 판결 표수가 클라우드로 실시간 반영 중입니다.</p>
             </div>
@@ -106,7 +156,6 @@
         let currentSuspectList = [];
         let timerInterval = null;
 
-        // 🔥 [완전 리뉴얼] 보내주신 이미지 양식과 1:1 일치하는 꽉 찬 명탐정 회색 상반신 실루엣 데이터
         const svgCriminalSilhouette = `<svg viewBox="0 0 100 100" class="w-full h-full text-[#64748b] bg-[#05090f]" fill="currentColor">
             <path d="M 50 12 C 40 12 36 21 34 32 C 20 33 10 35 2 40 C 8 42 18 42 30 42 C 29 47 28 53 33 61 C 23 64 16 68 10 74 C 16 76 20 70 30 68 C 29 76 33 81 48 81 C 63 81 67 76 66 68 C 76 70 80 76 86 74 C 80 68 73 64 63 61 C 68 53 67 47 66 42 C 78 42 88 44 94 40 C 86 35 76 33 66 32 C 64 21 60 12 50 12 Z"/>
             <path d="M 12 45 C 19 45 25 43 29 41 C 30 47 33 55 37 61 C 27 64 17 69 12 75 C 9 72 10 57 12 45 Z"/>
@@ -266,20 +315,35 @@
                 let statusBadge = s.isAlive 
                     ? `<span class="text-emerald-400 font-extrabold text-[11px] bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">🟢 생존</span>` 
                     : `<span class="text-red-500 font-extrabold text-[11px] bg-red-950/60 px-2 py-0.5 rounded border border-red-900 line-through">💀 탈락</span>`;
+                
+                const suspicion = Math.min(100, s.votedCount * 25);
 
                 container.innerHTML += `
-                    <div class="bg-[#111c2e] border-2 border-[#223956]/80 rounded-2xl flex flex-col justify-between min-h-[260px] shadow-lg relative overflow-hidden transition-all ${hasVotes ? 'suspect-target-glow' : ''}">
+                    <div class="bg-[#111c2e] border-2 border-[#223956]/80 rounded-2xl flex flex-col justify-between min-h-[340px] shadow-lg relative overflow-hidden transition-all">
                         <div class="absolute top-2 left-2 z-20">${statusBadge}</div>
                         
-                        <div class="w-full flex-1 flex items-end justify-center bg-[#05090f] overflow-hidden p-0">
+                        <div class="w-full h-32 bg-[#dbe4ee] relative flex-shrink-0">
+                            <div class="absolute top-2 right-2 bg-red-700 text-white text-[10px] px-2 py-1 rounded z-20 font-black">WANTED</div>
                             ${svgCriminalSilhouette}
                         </div>
                         
-                        <div class="w-full border-t-2 border-[#223956] bg-[#111c2e] p-3 text-center space-y-1 z-10">
-                            <span class="text-white text-xl font-black block">${s.name}</span>
-                            <span class="font-orbitron text-base font-black ${hasVotes ? 'text-red-500' : 'text-gray-400'} block">
-                                🎯 ${s.votedCount} 표 누적
-                            </span>
+                        <div class="w-full border-t-2 border-[#223956] bg-[#111c2e] p-3 text-center space-y-1 z-10 flex-1 flex flex-col justify-between">
+                            <div>
+                                <span class="text-white text-xl font-black block">${s.name}</span>
+                                <span class="font-orbitron text-sm font-black ${hasVotes ? 'text-red-500' : 'text-gray-400'} block mt-1">
+                                    🎯 ${s.votedCount} 표 누적
+                                </span>
+                            </div>
+
+                            <div class="w-full bg-[#f8fafc] text-[#0f172a] p-3 rounded-xl mt-2 text-left">
+                                <div class="text-xs font-black text-gray-600 flex justify-between">
+                                    <span>🚨 의심도</span>
+                                    <span class="text-red-600">${suspicion}%</span>
+                                </div>
+                                <div class="w-full bg-slate-300 rounded-full h-2 mt-1.5 overflow-hidden">
+                                    <div class="bg-red-600 h-full rounded-full transition-all duration-300" style="width:${suspicion}%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>`;
             });
@@ -287,7 +351,7 @@
             if (visibleList.length > 0 && visibleList.length < 8) {
                 const dummyCount = 8 - visibleList.length;
                 for (let i = 0; i < dummyCount; i++) {
-                    container.innerHTML += `<div class="bg-[#05090f]/20 border border-[#223956]/20 rounded-2xl p-4 min-h-[260px] border-dashed flex items-center justify-center text-gray-700 font-bold text-xs">수사망 공석</div>`;
+                    container.innerHTML += `<div class="bg-[#05090f]/20 border border-[#223956]/20 rounded-2xl p-4 min-h-[340px] border-dashed flex items-center justify-center text-gray-700 font-bold text-xs">수사망 공석</div>`;
                 }
             }
         }
@@ -329,37 +393,3 @@
                         </div>
                         <div class="w-full h-6 bg-slate-950 rounded-full overflow-hidden flex border-2 border-[#223956]">
                             <div class="bg-gradient-to-r from-red-700 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
-                            <div class="bg-gradient-to-r from-[#1b2b42] to-[#223956]" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
-                        </div>
-                    </div>`;
-            });
-        }
-
-        function closeCourt() {
-            let killedList = [];
-            let savedList = [];
-
-            currentSuspectList.forEach(name => {
-                const data = courtVotesData[name] || { execute: 0, save: 0 };
-                if(data.execute >= data.save) {
-                    gameState.students[name].isAlive = false;
-                    killedList.push(name);
-                } else {
-                    savedList.push(name);
-                }
-            });
-
-            db.ref('students').set(gameState.students);
-            db.ref('rawVotes').set({});
-            db.ref('courtVotes').set({});
-            db.ref('courtStatus').set({ active: false, suspect: "" });
-            db.ref('signal').set('RESET_ROUND');
-
-            let msg = "⚖️ [ 즉결 재판 최종 판결 결과 선포 ]\n\n";
-            if(killedList.length > 0) msg += `💀 CASE OUT (추방): ${killedList.join(', ')}\n`;
-            if(savedList.length > 0) msg += `🌿 SURVIVED (생존): ${savedList.join(', ')}\n`;
-            alert(msg);
-        }
-    </script>
-</body>
-</html>
