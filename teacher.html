@@ -110,28 +110,47 @@
                         <label class="block text-gray-300 text-sm mb-1.5 font-black">👤 용의선상 학생 이름 기입 (공백/쉼표 구분)</label>
                         <textarea id="input-students" class="w-full h-36 bg-[#05090f] border border-[#223956] rounded-xl p-3 text-white text-sm focus:outline-none focus:border-[#e0a96d] font-medium" placeholder="남도일, 유미란, 하인성, 정보라"></textarea>
                     </div>
-                    <!-- 🧩 용의자 프로필 단서 풀 설정 커스텀 영역 -->
-<div class="space-y-2 border-t border-b border-[#223956]/50 py-3 text-left">
-    <span class="text-xs text-[#e0a96d] block font-black">🧩 용의자 프로필 단서 풀 설정 (쉼표 구분)</span>
-    <div>
-        <label class="block text-gray-400 text-xs mb-1">🏫 학년 설정</label>
-        <input type="text" id="clues-grades" value="1niánjí, 2niánjí, 3niánjí" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs font-medium focus:outline-none focus:border-[#e0a96d]">
+                  <div class="space-y-3 border-t border-b border-[#223956]/50 py-3 text-left">
+    <span class="text-xs text-[#e0a96d] block font-black">📊 단서별 배정 인원수 설정</span>
+    
+    <div class="bg-[#05090f] p-2 rounded-lg border border-[#223956]/40">
+        <label class="block text-gray-400 text-xs mb-1 font-bold">🏫 학년별 인원</label>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+            <div class="flex items-center space-x-1"><span>1학년:</span><input type="number" id="num-grade1" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>2학년:</span><input type="number" id="num-grade2" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>3학년:</span><input type="number" id="num-grade3" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+        </div>
     </div>
-    <div>
-        <label class="block text-gray-400 text-xs mb-1">🎨 취미 설정</label>
-        <input type="text" id="clues-hobbies" value="chànggē, zuò cài, pāi shìpín, kàn diànyǐng, tīng yīnyuè" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs font-medium focus:outline-none focus:border-[#e0a96d]">
+
+    <div class="bg-[#05090f] p-2 rounded-lg border border-[#223956]/40">
+        <label class="block text-gray-400 text-xs mb-1 font-bold">🎨 취미별 인원</label>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center space-x-1"><span>요리하기:</span><input type="number" id="num-hobby1" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>노래부르기:</span><input type="number" id="num-hobby2" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>영상찍기:</span><input type="number" id="num-hobby3" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>영화보기:</span><input type="number" id="num-hobby4" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+        </div>
     </div>
-    <div>
-        <label class="block text-gray-400 text-xs mb-1">⚡ 능력(특기) 설정</label>
-        <input type="text" id="clues-skills" value="dǎ pīngpāngqiú, dǎ lánqiú, tī zúqiú" class="w-full bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs font-medium focus:outline-none focus:border-[#e0a96d]">
+
+    <div class="bg-[#05090f] p-2 rounded-lg border border-[#223956]/40">
+        <label class="block text-gray-400 text-xs mb-1 font-bold">⚡ 능력별 인원</label>
+        <div class="grid grid-cols-3 gap-2 text-xs">
+            <div class="flex items-center space-x-1"><span>축구:</span><input type="number" id="num-skill1" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>탁구:</span><input type="number" id="num-skill2" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>농구:</span><input type="number" id="num-skill3" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+        </div>
     </div>
-    <div>
-        <label class="block text-gray-400 text-xs mb-1">👔 장래희망 설정</label>
-        <textarea id="clues-jobs" class="w-full h-20 bg-[#05090f] border border-[#223956] rounded-lg p-2 text-white text-xs font-medium focus:outline-none focus:border-[#e0a96d]">yùndòngyuán,
-yīshēng,
-wǎnghóng,
-zuòjiā</textarea>
+
+    <div class="bg-[#05090f] p-2 rounded-lg border border-[#223956]/40">
+        <label class="block text-gray-400 text-xs mb-1 font-bold">👔 장래희망별 인원</label>
+        <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center space-x-1"><span>운동선수:</span><input type="number" id="num-job1" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>의사:</span><input type="number" id="num-job2" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>인플루언서:</span><input type="number" id="num-job3" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+            <div class="flex items-center space-x-1"><span>작가:</span><input type="number" id="num-job4" value="1" min="0" class="w-12 bg-[#101b2b] text-white p-1 rounded text-center"><span>명</span></div>
+        </div>
     </div>
+</div>
 </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -262,17 +281,67 @@ shadow-2xl
 
             if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
 
-            const grades = ["1학년", "2학년", "3학년"];
-            const hobbies = ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"];
-            const skills = ["축구", "탁구", "농구"];
-            const jobs = [
-                { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
-                { cn: "医生", py: "yīshēng", ko: "의사" },
-                { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
-                { cn: "作家", py: "zuòjiā", ko: "작가" }
-            ];
+           // 1. 입력된 인원수만큼 단서 데이터를 담을 배열(Pool)을 만듭니다.
+    let gradesPool = [];
+    for(let i=0; i<parseInt(document.getElementById('num-grade1').value)||0; i++) gradesPool.push("1학년");
+    for(let i=0; i<parseInt(document.getElementById('num-grade2').value)||0; i++) gradesPool.push("2학년");
+    for(let i=0; i<parseInt(document.getElementById('num-grade3').value)||0; i++) gradesPool.push("3학년");
 
-            let shuffled = [...names].sort(() => Math.random() - 0.5);
+    let hobbiesPool = [];
+    for(let i=0; i<parseInt(document.getElementById('num-hobby1').value)||0; i++) hobbiesPool.push("요리하기");
+    for(let i=0; i<parseInt(document.getElementById('num-hobby2').value)||0; i++) hobbiesPool.push("노래부르기");
+    for(let i=0; i<parseInt(document.getElementById('num-hobby3').value)||0; i++) hobbiesPool.push("영상찍기");
+    for(let i=0; i<parseInt(document.getElementById('num-hobby4').value)||0; i++) hobbiesPool.push("영화보기");
+
+    let skillsPool = [];
+    for(let i=0; i<parseInt(document.getElementById('num-skill1').value)||0; i++) skillsPool.push("축구");
+    for(let i=0; i<parseInt(document.getElementById('num-skill2').value)||0; i++) skillsPool.push("탁구");
+    for(let i=0; i<parseInt(document.getElementById('num-skill3').value)||0; i++) skillsPool.push("농구");
+
+    const jobsDefs = [
+        { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
+        { cn: "医生", py: "yīshēng", ko: "의사" },
+        { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
+        { cn: "作家", py: "zuòjiā", ko: "작가" }
+    ];
+    let jobsPool = [];
+    for(let i=0; i<parseInt(document.getElementById('num-job1').value)||0; i++) jobsPool.push(jobsDefs[0]);
+    for(let i=0; i<parseInt(document.getElementById('num-job2').value)||0; i++) jobsPool.push(jobsDefs[1]);
+    for(let i=0; i<parseInt(document.getElementById('num-job3').value)||0; i++) jobsPool.push(jobsDefs[2]);
+    for(let i=0; i<parseInt(document.getElementById('num-job4').value)||0; i++) jobsPool.push(jobsDefs[3]);
+
+    // 2. 단서들을 무작위로 섞어줍니다.
+    gradesPool.sort(() => Math.random() - 0.5);
+    hobbiesPool.sort(() => Math.random() - 0.5);
+    skillsPool.sort(() => Math.random() - 0.5);
+    jobsPool.sort(() => Math.random() - 0.5);
+
+    // 3. 학생들을 무작위로 섞은 뒤 역할을 배정하고 단서를 하나씩 나눠줍니다.
+    let shuffled = [...names].sort(() => Math.random() - 0.5);
+    let uploadData = {};
+
+    shuffled.forEach((name, idx) => {
+        let role = "시민";
+        if(idx < mafiaCnt) role = "마피아";
+        else if(idx < mafiaCnt + policeCnt) role = "경찰";
+
+        // 입력된 인원수 설정보다 학생 수가 많을 경우를 대비해 기본값(||) 설정
+        let profile = {
+            grade: gradesPool[idx] || "미정",
+            hobby: hobbiesPool[idx] || "음악듣기",
+            skill: skillsPool[idx] || "달리기",
+            job: jobsPool[idx] || { cn: "学生", py: "xuéshēng", ko: "학생" }
+        };
+        uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
+    });
+
+    // 앱 내부 단서 힌트 확인용 메타 데이터 정의
+    const metaClues = { 
+        grade: ["1학년", "2학년", "3학년"], 
+        hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기"], 
+        skill: ["축구", "탁구", "농구"], 
+        job: ["운동선수", "의사", "인플루언서", "작가"] 
+    };
             let uploadData = {};
 
             shuffled.forEach((name, idx) => {
