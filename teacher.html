@@ -68,16 +68,12 @@
     margin-bottom:10px;
 }
         
-       @keyframes pulse-border
-        /* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 방지 */
-#chart-container img { w-full; h-full; object-fit: cover; {
-    0%, 100% {
-        border-color: rgba(239, 68, 68, 0.5);
-    }
-    50% {
-        border-color: rgba(239, 68, 68, 1);
-    }
+@keyframes pulse-border {
+    0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
+    50% { border-color: rgba(239, 68, 68, 1); }
 }
+/* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 방지 */
+#chart-container img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body class="min-h-screen p-6 flex flex-col items-center">
@@ -213,7 +209,6 @@ shadow-2xl
     </div>
 
     <script>
-<script>
     const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
