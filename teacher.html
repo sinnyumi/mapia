@@ -68,7 +68,9 @@
     margin-bottom:10px;
 }
         
-       @keyframes pulse-border {
+       @keyframes pulse-border
+        /* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 방지 */
+#chart-container img { w-full; h-full; object-fit: cover; {
     0%, 100% {
         border-color: rgba(239, 68, 68, 0.5);
     }
@@ -272,89 +274,91 @@ shadow-2xl
     }
 
     // 🌟 선생님이 설정한 인원수를 완벽하게 반영하여 단서를 1:1 매칭 배분하는 핵심 로직
-    function generateGameData() {
-        const raw = document.getElementById('input-students').value;
-        const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
-        const mafiaCnt = parseInt(document.getElementById('count-mafia').value) || 1;
-        const policeCnt = parseInt(document.getElementById('count-police').value) || 1;
+function generateGameData() {
+            const raw = document.getElementById('input-students').value;
+            const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
+            const mafiaCnt = parseInt(document.getElementById('count-mafia').value) || 1;
+            const policeCnt = parseInt(document.getElementById('count-police').value) || 1;
 
-        if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
+            if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
 
-        // 1. 학년 인원수만큼 주머니 배열 만들기
-        let gradesPool = [];
-        for(let i=0; i<(parseInt(document.getElementById('num-grade1').value)||0); i++) gradesPool.push("1학년");
-        for(let i=0; i<(parseInt(document.getElementById('num-grade2').value)||0); i++) gradesPool.push("2학년");
-        for(let i=0; i<(parseInt(document.getElementById('num-grade3').value)||0); i++) gradesPool.push("3학년");
+            // 1. 학년 인원수 배열 생성
+            let gradesPool = [];
+            for(let i=0; i<(parseInt(document.getElementById('num-grade1').value)||0); i++) gradesPool.push("1학년");
+            for(let i=0; i<(parseInt(document.getElementById('num-grade2').value)||0); i++) gradesPool.push("2학년");
+            for(let i=0; i<(parseInt(document.getElementById('num-grade3').value)||0); i++) gradesPool.push("3학년");
 
-        // 2. 취미 인원수만큼 주머니 배열 만들기
-        let hobbiesPool = [];
-        for(let i=0; i<(parseInt(document.getElementById('num-hobby1').value)||0); i++) hobbiesPool.push("요리하기");
-        for(let i=0; i<(parseInt(document.getElementById('num-hobby2').value)||0); i++) hobbiesPool.push("노래부르기");
-        for(let i=0; i<(parseInt(document.getElementById('num-hobby3').value)||0); i++) hobbiesPool.push("영상찍기");
-        for(let i=0; i<(parseInt(document.getElementById('num-hobby4').value)||0); i++) hobbiesPool.push("영화보기");
+            // 2. 취미 인원수 배열 생성
+            let hobbiesPool = [];
+            for(let i=0; i<(parseInt(document.getElementById('num-hobby1').value)||0); i++) hobbiesPool.push("요리하기");
+            for(let i=0; i<(parseInt(document.getElementById('num-hobby2').value)||0); i++) hobbiesPool.push("노래부르기");
+            for(let i=0; i<(parseInt(document.getElementById('num-hobby3').value)||0); i++) hobbiesPool.push("영상찍기");
+            for(let i=0; i<(parseInt(document.getElementById('num-hobby4').value)||0); i++) hobbiesPool.push("영화보기");
 
-        // 3. 능력 인원수만큼 주머니 배열 만들기
-        let skillsPool = [];
-        for(let i=0; i<(parseInt(document.getElementById('num-skill1').value)||0); i++) skillsPool.push("축구");
-        for(let i=0; i<(parseInt(document.getElementById('num-skill2').value)||0); i++) skillsPool.push("탁구");
-        for(let i=0; i<(parseInt(document.getElementById('num-skill3').value)||0); i++) skillsPool.push("농구");
+            // 3. 능력 인원수 배열 생성
+            let skillsPool = [];
+            for(let i=0; i<(parseInt(document.getElementById('num-skill1').value)||0); i++) skillsPool.push("축구");
+            for(let i=0; i<(parseInt(document.getElementById('num-skill2').value)||0); i++) skillsPool.push("탁구");
+            for(let i=0; i<(parseInt(document.getElementById('num-skill3').value)||0); i++) skillsPool.push("농구");
 
-        // 4. 장래희망 직업 인원수만큼 주머니 배열 만들기 (중국어 변환 정의 반영)
-        const jobsDefs = [
-            { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
-            { cn: "医生", py: "yīshēng", ko: "의사" },
-            { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
-            { cn: "作家", py: "zuòjiā", ko: "작가" }
-        ];
-        let jobsPool = [];
-        for(let i=0; i<(parseInt(document.getElementById('num-job1').value)||0); i++) jobsPool.push(jobsDefs[0]);
-        for(let i=0; i<(parseInt(document.getElementById('num-job2').value)||0); i++) jobsPool.push(jobsDefs[1]);
-        for(let i=0; i<(parseInt(document.getElementById('num-job3').value)||0); i++) jobsPool.push(jobsDefs[2]);
-        for(let i=0; i<(parseInt(document.getElementById('num-job4').value)||0); i++) jobsPool.push(jobsDefs[3]);
+            // 4. 장래희망 직업 인원수 배열 생성 (학생 앱 인식 전용 데이터 구조)
+            const jobsDefs = [
+                { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
+                { cn: "医生", py: "yīshēng", ko: "의사" },
+                { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
+                { cn: "作家", py: "zuòjiā", ko: "작가" }
+            ];
+            let jobsPool = [];
+            for(let i=0; i<(parseInt(document.getElementById('num-job1').value)||0); i++) jobsPool.push(jobsDefs[0]);
+            for(let i=0; i<(parseInt(document.getElementById('num-job2').value)||0); i++) jobsPool.push(jobsDefs[1]);
+            for(let i=0; i<(parseInt(document.getElementById('num-job3').value)||0); i++) jobsPool.push(jobsDefs[2]);
+            for(let i=0; i<(parseInt(document.getElementById('num-job4').value)||0); i++) jobsPool.push(jobsDefs[3]);
 
-        // 5. 각 단서 주머니들을 무작위로 한 번 뒤섞어 균등성을 확보합니다.
-        gradesPool.sort(() => Math.random() - 0.5);
-        hobbiesPool.sort(() => Math.random() - 0.5);
-        skillsPool.sort(() => Math.random() - 0.5);
-        jobsPool.sort(() => Math.random() - 0.5);
+            // 5. 단서 셔플
+            gradesPool.sort(() => Math.random() - 0.5);
+            hobbiesPool.sort(() => Math.random() - 0.5);
+            skillsPool.sort(() => Math.random() - 0.5);
+            jobsPool.sort(() => Math.random() - 0.5);
 
-        // 6. 학생 명단도 무작위로 섞어 배치합니다.
-        let shuffled = [...names].sort(() => Math.random() - 0.5);
-        let uploadData = {};
+            // 6. 학생 명단 무작위 정렬
+            let shuffled = [...names].sort(() => Math.random() - 0.5);
+            let uploadData = {};
 
-        // 7. 섞인 명단 순서대로 섞인 단서들을 1개씩 순서매칭 배정
-        shuffled.forEach((name, idx) => {
-            let role = "시민";
-            if(idx < mafiaCnt) role = "마피아";
-            else if(idx < mafiaCnt + policeCnt) role = "경찰";
+            // 7. 1:1 매칭 분배 (인원수가 부족할 시 기본 방어값 작동)
+            shuffled.forEach((name, idx) => {
+                let role = "시민";
+                if(idx < mafiaCnt) role = "마피아";
+                else if(idx < mafiaCnt + policeCnt) role = "경찰";
 
-            let profile = {
-                grade: gradesPool[idx] || "미정",
-                hobby: hobbiesPool[idx] || "음악듣기",
-                skill: skillsPool[idx] || "달리기",
-                job: jobsPool[idx] || { cn: "学生", py: "xuéshēng", ko: "학생" }
+                let profile = {
+                    grade: gradesPool[idx] || "1학년",
+                    hobby: hobbiesPool[idx] || "요리하기",
+                    skill: skillsPool[idx] || "축구",
+                    job: jobsPool[idx] || jobsDefs[0]
+                };
+                uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
+            });
+
+            // 🔗 [핵심] 학생이 용의자를 추출할 때 Firebase와 단서 풀 데이터 규칙을 맞추기 위해 맵핑 리스트를 보정합니다.
+            const metaClues = { 
+                grade: ["1학년", "2학년", "3학년"], 
+                hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기", "음악듣기"], 
+                skill: ["축구", "탁구", "농구"], 
+                job: ["운동선수", "의사", "인플루언서", "작가"] 
             };
-            uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
-        });
 
-        const metaClues = { 
-            grade: ["1학년", "2학년", "3학년"], 
-            hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기"], 
-            skill: ["축구", "탁구", "농구"], 
-            job: ["운동선수", "의사", "인플루언서", "작가"] 
-        };
-
-        db.ref('/').set({
-            students: uploadData,
-            cluesPool: metaClues,
-            rawVotes: {},
-            courtVotes: {},
-            courtStatus: { active: false, suspect: "" },
-            globalTimer: "05:00",
-            signal: "INIT"
-        });
-        alert("수사망 가동 완료! 설정하신 인원수 제한 규칙에 맞춰 프로필 단서가 정밀 배분되었습니다.");
-    }
+            // 8. Firebase 클라우드 전송
+            db.ref('/').set({
+                students: uploadData,
+                cluesPool: metaClues,
+                rawVotes: {},
+                courtVotes: {},
+                courtStatus: { active: false, suspect: "" },
+                globalTimer: "05:00",
+                signal: "INIT"
+            });
+            alert("수사망 가동 완료! UI 깨짐 방지 및 학생용 기기 연동 필터 보정이 완료되었습니다.");
+        }
 
     function startTimer() {
         let sec = 300;
