@@ -211,370 +211,299 @@ shadow-2xl
     </div>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<script>
+    const firebaseConfig = { databaseURL: "https://hanyuyouxi-default-rtdb.firebaseio.com/" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-        let gameState = { students: {} };
-        let rawVotesRegistry = {}; 
-        let courtVotesData = {}; 
-        let currentSuspectList = [];
-        let timerInterval = null;
+    let gameState = { students: {} };
+    let rawVotesRegistry = {}; 
+    let courtVotesData = {}; 
+    let currentSuspectList = [];
+    let timerInterval = null;
 
-
-
-        db.ref('students').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                gameState.students = data;
-                renderChart( );
-            }
-        });
-
-        db.ref('rawVotes').on('value', (snapshot) => {
-            rawVotesRegistry = snapshot.val() || {};
+    db.ref('students').on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            gameState.students = data;
             renderChart();
-        });
-
-        db.ref('courtVotes').on('value', (snapshot) => {
-            courtVotesData = snapshot.val() || {};
-            renderCourtScales();
-        });
-
-        db.ref('globalTimer').on('value', (snapshot) => {
-            const timeStr = snapshot.val();
-            if(timeStr) document.getElementById('display-timer').innerText = timeStr;
-        });
-
-        db.ref('courtStatus').on('value', (snapshot) => {
-            const status = snapshot.val();
-            if(status && status.active) {
-                currentSuspectList = status.suspect.split(', ').filter(n => n.trim().length > 0);
-                document.getElementById('court-panel').classList.remove('hidden');
-            } else {
-                document.getElementById('court-panel').classList.add('hidden');
-            }
-        });
-
-
-        function resetServerAll() {
-            if(!confirm("서버의 모든 게임 데이터를 초기화하시겠습니까? 학생 기기도 전부 로그아웃됩니다.")) return;
-            clearInterval(timerInterval);
-            db.ref('/').set({
-                students: {},
-                cluesPool: {},
-                rawVotes: {},
-                courtVotes: {},
-                courtStatus: { active: false, suspect: "" },
-                globalTimer: "05:00",
-                signal: "RESET_ALL"
-            });
-            document.getElementById('chart-container').innerHTML = `<p class="text-base text-gray-500 italic text-center py-20 font-bold">서버 데이터가 완전히 리셋되었습니다.</p>`;
-            alert("서버 완전 리셋 완료!");
         }
-
-        function generateGameData() {
-            const raw = document.getElementById('input-students').value;
-            const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
-            const mafiaCnt = parseInt(document.getElementById('count-mafia').value) || 1;
-            const policeCnt = parseInt(document.getElementById('count-police').value) || 1;
-
-            if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
-
-           // 1. 입력된 인원수만큼 단서 데이터를 담을 배열(Pool)을 만듭니다.
-    let gradesPool = [];
-    for(let i=0; i<parseInt(document.getElementById('num-grade1').value)||0; i++) gradesPool.push("1학년");
-    for(let i=0; i<parseInt(document.getElementById('num-grade2').value)||0; i++) gradesPool.push("2학년");
-    for(let i=0; i<parseInt(document.getElementById('num-grade3').value)||0; i++) gradesPool.push("3학년");
-
-    let hobbiesPool = [];
-    for(let i=0; i<parseInt(document.getElementById('num-hobby1').value)||0; i++) hobbiesPool.push("요리하기");
-    for(let i=0; i<parseInt(document.getElementById('num-hobby2').value)||0; i++) hobbiesPool.push("노래부르기");
-    for(let i=0; i<parseInt(document.getElementById('num-hobby3').value)||0; i++) hobbiesPool.push("영상찍기");
-    for(let i=0; i<parseInt(document.getElementById('num-hobby4').value)||0; i++) hobbiesPool.push("영화보기");
-
-    let skillsPool = [];
-    for(let i=0; i<parseInt(document.getElementById('num-skill1').value)||0; i++) skillsPool.push("축구");
-    for(let i=0; i<parseInt(document.getElementById('num-skill2').value)||0; i++) skillsPool.push("탁구");
-    for(let i=0; i<parseInt(document.getElementById('num-skill3').value)||0; i++) skillsPool.push("농구");
-
-    const jobsDefs = [
-        { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
-        { cn: "医生", py: "yīshēng", ko: "의사" },
-        { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
-        { cn: "作家", py: "zuòjiā", ko: "작가" }
-    ];
-    let jobsPool = [];
-    for(let i=0; i<parseInt(document.getElementById('num-job1').value)||0; i++) jobsPool.push(jobsDefs[0]);
-    for(let i=0; i<parseInt(document.getElementById('num-job2').value)||0; i++) jobsPool.push(jobsDefs[1]);
-    for(let i=0; i<parseInt(document.getElementById('num-job3').value)||0; i++) jobsPool.push(jobsDefs[2]);
-    for(let i=0; i<parseInt(document.getElementById('num-job4').value)||0; i++) jobsPool.push(jobsDefs[3]);
-
-    // 2. 단서들을 무작위로 섞어줍니다.
-    gradesPool.sort(() => Math.random() - 0.5);
-    hobbiesPool.sort(() => Math.random() - 0.5);
-    skillsPool.sort(() => Math.random() - 0.5);
-    jobsPool.sort(() => Math.random() - 0.5);
-
-    // 3. 학생들을 무작위로 섞은 뒤 역할을 배정하고 단서를 하나씩 나눠줍니다.
-    let shuffled = [...names].sort(() => Math.random() - 0.5);
-    let uploadData = {};
-
-    shuffled.forEach((name, idx) => {
-        let role = "시민";
-        if(idx < mafiaCnt) role = "마피아";
-        else if(idx < mafiaCnt + policeCnt) role = "경찰";
-
-        // 입력된 인원수 설정보다 학생 수가 많을 경우를 대비해 기본값(||) 설정
-        let profile = {
-            grade: gradesPool[idx] || "미정",
-            hobby: hobbiesPool[idx] || "음악듣기",
-            skill: skillsPool[idx] || "달리기",
-            job: jobsPool[idx] || { cn: "学生", py: "xuéshēng", ko: "학생" }
-        };
-        uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
     });
 
-    // 앱 내부 단서 힌트 확인용 메타 데이터 정의
-    const metaClues = { 
-        grade: ["1학년", "2학년", "3학년"], 
-        hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기"], 
-        skill: ["축구", "탁구", "농구"], 
-        job: ["운동선수", "의사", "인플루언서", "작가"] 
-    };
-            let uploadData = {};
+    db.ref('rawVotes').on('value', (snapshot) => {
+        rawVotesRegistry = snapshot.val() || {};
+        renderChart();
+    });
 
-            shuffled.forEach((name, idx) => {
-                let role = "시민";
-                if(idx < mafiaCnt) role = "마피아";
-                else if(idx < mafiaCnt + policeCnt) role = "경찰";
+    db.ref('courtVotes').on('value', (snapshot) => {
+        courtVotesData = snapshot.val() || {};
+        renderCourtScales();
+    });
 
-                let profile = {
-                    grade: grades[Math.floor(Math.random() * grades.length)],
-                    hobby: hobbies[Math.floor(Math.random() * hobbies.length)],
-                    skill: skills[Math.floor(Math.random() * skills.length)],
-                    job: jobs[Math.floor(Math.random() * jobs.length)]
-                };
-                uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
-            });
+    db.ref('globalTimer').on('value', (snapshot) => {
+        const timeStr = snapshot.val();
+        if(timeStr) document.getElementById('display-timer').innerText = timeStr;
+    });
 
-            const metaClues = { grade: grades, hobby: hobbies, skill: skills, job: jobs.map(j => j.ko) };
-
-            db.ref('/').set({
-                students: uploadData,
-                cluesPool: metaClues,
-                rawVotes: {},
-                courtVotes: {},
-                courtStatus: { active: false, suspect: "" },
-                globalTimer: "05:00",
-                signal: "INIT"
-            });
-            alert("수사망 가동 완료! 인원 세팅에 맞춰 역할이 배분되었습니다.");
+    db.ref('courtStatus').on('value', (snapshot) => {
+        const status = snapshot.val();
+        if(status && status.active) {
+            currentSuspectList = status.suspect.split(', ').filter(n => n.trim().length > 0);
+            document.getElementById('court-panel').classList.remove('hidden');
+        } else {
+            document.getElementById('court-panel').classList.add('hidden');
         }
+    });
 
-        function startTimer() {
-            let sec = 300;
-            clearInterval(timerInterval);
-            db.ref('signal').set('START_TIMER');
-            timerInterval = setInterval(() => {
-                sec--;
-                if(sec <= 0) clearInterval(timerInterval);
-                const m = String(Math.floor(sec / 60)).padStart(2, '0');
-                const s = String(sec % 60).padStart(2, '0');
-                db.ref('globalTimer').set(`${m}:${s}`);
-            }, 1000);
-        }
+    function resetServerAll() {
+        if(!confirm("서버의 모든 게임 데이터를 초기화하시겠습니까? 학생 기기도 전부 로그아웃됩니다.")) return;
+        clearInterval(timerInterval);
+        db.ref('/').set({
+            students: {},
+            cluesPool: {},
+            rawVotes: {},
+            courtVotes: {},
+            courtStatus: { active: false, suspect: "" },
+            globalTimer: "05:00",
+            signal: "RESET_ALL"
+        });
+        document.getElementById('chart-container').innerHTML = `<p class="text-base text-gray-500 italic text-center py-20 font-bold">서버 데이터가 완전히 리셋되었습니다.</p>`;
+        alert("서버 완전 리셋 완료!");
+    }
 
-        function recalculateVotedCounts() {
-            Object.keys(gameState.students).forEach(name => {
-                gameState.students[name].votedCount = 0;
+    // 🌟 선생님이 설정한 인원수를 완벽하게 반영하여 단서를 1:1 매칭 배분하는 핵심 로직
+    function generateGameData() {
+        const raw = document.getElementById('input-students').value;
+        const names = raw.split(/[\s,]+/).filter(n => n.trim().length > 0);
+        const mafiaCnt = parseInt(document.getElementById('count-mafia').value) || 1;
+        const policeCnt = parseInt(document.getElementById('count-police').value) || 1;
+
+        if (names.length < 3) { alert("최소 3명 이상의 학생을 기입하세요."); return; }
+
+        // 1. 학년 인원수만큼 주머니 배열 만들기
+        let gradesPool = [];
+        for(let i=0; i<(parseInt(document.getElementById('num-grade1').value)||0); i++) gradesPool.push("1학년");
+        for(let i=0; i<(parseInt(document.getElementById('num-grade2').value)||0); i++) gradesPool.push("2학년");
+        for(let i=0; i<(parseInt(document.getElementById('num-grade3').value)||0); i++) gradesPool.push("3학년");
+
+        // 2. 취미 인원수만큼 주머니 배열 만들기
+        let hobbiesPool = [];
+        for(let i=0; i<(parseInt(document.getElementById('num-hobby1').value)||0); i++) hobbiesPool.push("요리하기");
+        for(let i=0; i<(parseInt(document.getElementById('num-hobby2').value)||0); i++) hobbiesPool.push("노래부르기");
+        for(let i=0; i<(parseInt(document.getElementById('num-hobby3').value)||0); i++) hobbiesPool.push("영상찍기");
+        for(let i=0; i<(parseInt(document.getElementById('num-hobby4').value)||0); i++) hobbiesPool.push("영화보기");
+
+        // 3. 능력 인원수만큼 주머니 배열 만들기
+        let skillsPool = [];
+        for(let i=0; i<(parseInt(document.getElementById('num-skill1').value)||0); i++) skillsPool.push("축구");
+        for(let i=0; i<(parseInt(document.getElementById('num-skill2').value)||0); i++) skillsPool.push("탁구");
+        for(let i=0; i<(parseInt(document.getElementById('num-skill3').value)||0); i++) skillsPool.push("농구");
+
+        // 4. 장래희망 직업 인원수만큼 주머니 배열 만들기 (중국어 변환 정의 반영)
+        const jobsDefs = [
+            { cn: "运动选手", py: "yùndòng xuǎnshǒu", ko: "운동선수" },
+            { cn: "医生", py: "yīshēng", ko: "의사" },
+            { cn: "网络红人", py: "wǎngluò hóngrén", ko: "인플루언서" },
+            { cn: "作家", py: "zuòjiā", ko: "작가" }
+        ];
+        let jobsPool = [];
+        for(let i=0; i<(parseInt(document.getElementById('num-job1').value)||0); i++) jobsPool.push(jobsDefs[0]);
+        for(let i=0; i<(parseInt(document.getElementById('num-job2').value)||0); i++) jobsPool.push(jobsDefs[1]);
+        for(let i=0; i<(parseInt(document.getElementById('num-job3').value)||0); i++) jobsPool.push(jobsDefs[2]);
+        for(let i=0; i<(parseInt(document.getElementById('num-job4').value)||0); i++) jobsPool.push(jobsDefs[3]);
+
+        // 5. 각 단서 주머니들을 무작위로 한 번 뒤섞어 균등성을 확보합니다.
+        gradesPool.sort(() => Math.random() - 0.5);
+        hobbiesPool.sort(() => Math.random() - 0.5);
+        skillsPool.sort(() => Math.random() - 0.5);
+        jobsPool.sort(() => Math.random() - 0.5);
+
+        // 6. 학생 명단도 무작위로 섞어 배치합니다.
+        let shuffled = [...names].sort(() => Math.random() - 0.5);
+        let uploadData = {};
+
+        // 7. 섞인 명단 순서대로 섞인 단서들을 1개씩 순서매칭 배정
+        shuffled.forEach((name, idx) => {
+            let role = "시민";
+            if(idx < mafiaCnt) role = "마피아";
+            else if(idx < mafiaCnt + policeCnt) role = "경찰";
+
+            let profile = {
+                grade: gradesPool[idx] || "미정",
+                hobby: hobbiesPool[idx] || "음악듣기",
+                skill: skillsPool[idx] || "달리기",
+                job: jobsPool[idx] || { cn: "学生", py: "xuéshēng", ko: "학생" }
+            };
+            uploadData[name] = { name, role, isAlive: true, profile, votedCount: 0 };
+        });
+
+        const metaClues = { 
+            grade: ["1학년", "2학년", "3학년"], 
+            hobby: ["요리하기", "노래부르기", "영상찍기", "영화보기"], 
+            skill: ["축구", "탁구", "농구"], 
+            job: ["운동선수", "의사", "인플루언서", "작가"] 
+        };
+
+        db.ref('/').set({
+            students: uploadData,
+            cluesPool: metaClues,
+            rawVotes: {},
+            courtVotes: {},
+            courtStatus: { active: false, suspect: "" },
+            globalTimer: "05:00",
+            signal: "INIT"
+        });
+        alert("수사망 가동 완료! 설정하신 인원수 제한 규칙에 맞춰 프로필 단서가 정밀 배분되었습니다.");
+    }
+
+    function startTimer() {
+        let sec = 300;
+        clearInterval(timerInterval);
+        db.ref('signal').set('START_TIMER');
+        timerInterval = setInterval(() => {
+            sec--;
+            if(sec <= 0) clearInterval(timerInterval);
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            db.ref('globalTimer').set(`${m}:${s}`);
+        }, 1000);
+    }
+
+    function recalculateVotedCounts() {
+        Object.keys(gameState.students).forEach(name => {
+            gameState.students[name].votedCount = 0;
+        });
+        Object.values(rawVotesRegistry).forEach(votesArray => {
+            votesArray.forEach(suspectName => {
+                if (gameState.students[suspectName]) {
+                    gameState.students[suspectName].votedCount++;
+                }
             });
-            Object.values(rawVotesRegistry).forEach(votesArray => {
-                votesArray.forEach(suspectName => {
-                    if (gameState.students[suspectName]) {
-                        gameState.students[suspectName].votedCount++;
-                    }
-                });
-            });
-        }
+        });
+    }
 
-        function renderChart() {
-            recalculateVotedCounts();
-            const container = document.getElementById('chart-container');
-            container.innerHTML = "";
-            const list = Object.values(gameState.students);
-            if(list.length === 0) return;
+    function renderChart() {
+        recalculateVotedCounts();
+        const container = document.getElementById('chart-container');
+        container.innerHTML = "";
+        const list = Object.values(gameState.students);
+        if(list.length === 0) return;
 
-            let visibleList = [...list];
-            if(visibleList.length > 8) visibleList = visibleList.slice(0, 8);
+        let visibleList = [...list];
+        if(visibleList.length > 8) visibleList = visibleList.slice(0, 8);
 
-           visibleList.forEach((s, idx) => {
+        visibleList.forEach((s, idx) => {
+            const suspicion = Math.min(100, s.votedCount * 25);
+            const statusBadge = s.isAlive
+                ? `<span class="text-emerald-400 font-extrabold text-[11px] bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">🟢 생존</span>`
+                : `<span class="text-red-500 font-extrabold text-[11px] bg-red-950/60 px-2 py-0.5 rounded border border-red-900 line-through">💀 탈락</span>`;
 
-    const hasVotes = s.votedCount > 0 && s.isAlive;
-    const suspicion = Math.min(100, s.votedCount * 25);
-
-    const statusBadge = s.isAlive
-        ? `<span class="text-emerald-400 font-extrabold text-[11px] bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">🟢 생존</span>`
-        : `<span class="text-red-500 font-extrabold text-[11px] bg-red-950/60 px-2 py-0.5 rounded border border-red-900 line-through">💀 탈락</span>`;
-
-    container.innerHTML += `
-        <div class="
-            bg-[#efe5cf]
-            border-4
-            border-[#b08a42]
-            rounded-xl
-            overflow-hidden
-            shadow-2xl
-            relative
-            min-h-[260px]
-        ">
-
-            <div class="absolute top-2 left-2 z-20">
-                ${statusBadge}
-            </div>
-
-            <div class="
-                absolute top-2 right-2
-                bg-red-800
-                text-white
-                font-black
-                text-xs
-                px-3 py-1
-                rounded
-                rotate-12
-                z-20
-            ">
-                WANTED
-            </div>
-
-            <div class="w-full h-48 bg-[#efe5cf] overflow-hidden">
-                <img src="https://raw.githubusercontent.com/sinnyumi/mapia/main/%EB%B2%94%EC%9D%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png" alt="범인 이미지">
-            </div>
-
-            <div class="
-                bg-[#f8f1df]
-                p-4
-                text-center
-                border-t
-                border-[#d4c2a1]
-            ">
-
-                <div class="text-[#111827] text-xl font-black">
-                    ${s.name}
-                </div>
-
-                <div class="font-black text-red-500 mt-2">
-                    🎯 ${s.votedCount} 표 누적
-                </div>
-
-                <div class="mt-3">
-                    <div class="text-xs font-black text-red-500">
-                        🚨 의심도
+            container.innerHTML += `
+                <div class="bg-[#efe5cf] border-4 border-[#b08a42] rounded-xl overflow-hidden shadow-2xl relative min-h-[260px]">
+                    <div class="absolute top-2 left-2 z-20">${statusBadge}</div>
+                    <div class="absolute top-2 right-2 bg-red-800 text-white font-black text-xs px-3 py-1 rounded rotate-12 z-20">WANTED</div>
+                    <div class="w-full h-48 bg-[#efe5cf] overflow-hidden">
+                        <img src="https://raw.githubusercontent.com/sinnyumi/mapia/main/%EB%B2%94%EC%9D%B8%EC%9D%B4%EB%AF%B8%EC%A7%80.png" alt="범인 이미지">
                     </div>
-
-                    <div class="w-full bg-slate-300 rounded-full h-3 mt-1">
-                        <div
-                            class="bg-red-600 h-3 rounded-full"
-                            style="width:${suspicion}%">
+                    <div class="bg-[#f8f1df] p-4 text-center border-t border-[#d4c2a1]">
+                        <div class="text-[#111827] text-xl font-black">${s.name}</div>
+                        <div class="font-black text-red-500 mt-2">🎯 ${s.votedCount} 표 누적</div>
+                        <div class="mt-3">
+                            <div class="text-xs font-black text-red-500">🚨 의심도</div>
+                            <div class="w-full bg-slate-300 rounded-full h-3 mt-1">
+                                <div class="bg-red-600 h-3 rounded-full" style="width:${suspicion}%"></div>
+                            </div>
+                            <div class="text-red-600 font-black mt-1">${suspicion}%</div>
                         </div>
                     </div>
-
-                    <div class="text-red-600 font-black mt-1">
-                        ${suspicion}%
-                    </div>
                 </div>
+            `;
+        });
 
-            </div>
-        </div>
-    `;
-});
-
-            if (visibleList.length > 0 && visibleList.length < 8) {
-                const dummyCount = 8 - visibleList.length;
-                for (let i = 0; i < dummyCount; i++) {
-                    container.innerHTML += `<div class="bg-[#05090f]/20 border border-[#223956]/20 rounded-2xl p-4 min-h-[260px] border-dashed flex items-center justify-center text-gray-700 font-bold text-xs">수사망 공석</div>`;
-                }
+        if (visibleList.length > 0 && visibleList.length < 8) {
+            const dummyCount = 8 - visibleList.length;
+            for (let i = 0; i < dummyCount; i++) {
+                container.innerHTML += `<div class="bg-[#05090f]/20 border border-[#223956]/20 rounded-2xl p-4 min-h-[260px] border-dashed flex items-center justify-center text-gray-700 font-bold text-xs">수사망 공석</div>`;
             }
         }
+    }
 
-        function extractAllSuspects() {
-            recalculateVotedCounts();
-            const list = Object.values(gameState.students).filter(s => s.isAlive && s.votedCount > 0);
-            if(list.length === 0) { alert("제출된 알리바이 수사 기록 패킷이 전무합니다."); return; }
-            
-            currentSuspectList = list.map(s => s.name);
-            let initCourtVotes = {};
-            currentSuspectList.forEach(name => { initCourtVotes[name] = { execute: 0, save: 0 }; });
+    function extractAllSuspects() {
+        recalculateVotedCounts();
+        const list = Object.values(gameState.students).filter(s => s.isAlive && s.votedCount > 0);
+        if(list.length === 0) { alert("제출된 알리바이 수사 기록 패킷이 전무합니다."); return; }
+        
+        currentSuspectList = list.map(s => s.name);
+        let initCourtVotes = {};
+        currentSuspectList.forEach(name => { initCourtVotes[name] = { execute: 0, save: 0 }; });
 
-            db.ref('courtVotes').set(initCourtVotes);
-            const suspectString = currentSuspectList.join(', ');
-            db.ref('courtStatus').set({ active: true, suspect: suspectString });
-            db.ref('signal').set('START_COURT');
-        }
+        db.ref('courtVotes').set(initCourtVotes);
+        const suspectString = currentSuspectList.join(', ');
+        db.ref('courtStatus').set({ active: true, suspect: suspectString });
+        db.ref('signal').set('START_COURT');
+    }
 
-        function renderCourtScales() {
-            const container = document.getElementById('court-scales-container');
-            if(!container) return;
-            container.innerHTML = "";
+    function renderCourtScales() {
+        const container = document.getElementById('court-scales-container');
+        if(!container) return;
+        container.innerHTML = "";
 
-            currentSuspectList.forEach(name => {
-                const data = courtVotesData[name] || { execute: 0, save: 0 };
-                const total = data.execute + data.save || 1;
-                const exePct = (data.execute / total) * 100;
-                const savePct = (data.save / total) * 100;
+        currentSuspectList.forEach(name => {
+            const data = courtVotesData[name] || { execute: 0, save: 0 };
+            const total = data.execute + data.save || 1;
+            const exePct = (data.execute / total) * 100;
+            const savePct = (data.save / total) * 100;
 
-                container.innerHTML += `
-                    <div class="bg-[#05090f] p-5 rounded-2xl border-2 border-[#223956] space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-white font-black text-lg lg:text-xl">👤 용의 기소자: <span class="text-red-400 underline">${name}</span></span>
-                            <div class="flex space-x-6 text-sm lg:text-base font-black">
-                                <span class="text-red-500">💥 처형: ${data.execute}표</span>
-                                <span class="text-[#e0a96d]">🌿 면죄: ${data.save}표</span>
-                            </div>
+            container.innerHTML += `
+                <div class="bg-[#05090f] p-5 rounded-2xl border-2 border-[#223956] space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white font-black text-lg lg:text-xl">👤 용의 기소자: <span class="text-red-400 underline">${name}</span></span>
+                        <div class="flex space-x-6 text-sm lg:text-base font-black">
+                            <span class="text-red-500">💥 처형: ${data.execute}표</span>
+                            <span class="text-[#e0a96d]">🌿 면죄: ${data.save}표</span>
                         </div>
-                        <div class="w-full h-6 bg-slate-950 rounded-full overflow-hidden flex border-2 border-[#223956]">
-                            <div class="bg-gradient-to-r from-red-700 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
-                            <div class="bg-gradient-to-r from-[#1b2b42] to-[#223956]" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
-                        </div>
-                    </div>`;
-            });
-        }
-function toggleSetupVisibility() {
-    const setup = document.getElementById('setup-content');
-    const btn = document.getElementById('btn-toggle-setup');
+                    </div>
+                    <div class="w-full h-6 bg-slate-950 rounded-full overflow-hidden flex border-2 border-[#223956]">
+                        <div class="bg-gradient-to-r from-red-700 to-red-500" style="width: ${data.execute === 0 && data.save === 0 ? 50 : exePct}%"></div>
+                        <div class="bg-gradient-to-r from-[#1b2b42] to-[#223956]" style="width: ${data.execute === 0 && data.save === 0 ? 50 : savePct}%"></div>
+                    </div>
+                </div>`;
+        });
+    }
 
-    setup.classList.toggle('hidden');
+    function toggleSetupVisibility() {
+        const setup = document.getElementById('setup-content');
+        const btn = document.getElementById('btn-toggle-setup');
+        setup.classList.toggle('hidden');
+        btn.textContent = setup.classList.contains('hidden') ? '👁️ 설정창 보기' : '👁️ 설정창 숨기기';
+    }
 
-    btn.textContent =
-        setup.classList.contains('hidden')
-        ? '👁️ 설정창 보기'
-        : '👁️ 설정창 숨기기';
-}
-        function closeCourt() {
-            let killedList = [];
-            let savedList = [];
+    function closeCourt() {
+        let killedList = [];
+        let savedList = [];
 
-            currentSuspectList.forEach(name => {
-                const data = courtVotesData[name] || { execute: 0, save: 0 };
-                if(data.execute >= data.save) {
-                    gameState.students[name].isAlive = false;
-                    killedList.push(name);
-                } else {
-                    savedList.push(name);
-                }
-            });
+        currentSuspectList.forEach(name => {
+            const data = courtVotesData[name] || { execute: 0, save: 0 };
+            if(data.execute >= data.save) {
+                gameState.students[name].isAlive = false;
+                killedList.push(name);
+            } else {
+                savedList.push(name);
+            }
+        });
 
-            db.ref('students').set(gameState.students);
-            db.ref('rawVotes').set({});
-            db.ref('courtVotes').set({});
-            db.ref('courtStatus').set({ active: false, suspect: "" });
-            db.ref('signal').set('RESET_ROUND');
+        db.ref('students').set(gameState.students);
+        db.ref('rawVotes').set({});
+        db.ref('courtVotes').set({});
+        db.ref('courtStatus').set({ active: false, suspect: "" });
+        db.ref('signal').set('RESET_ROUND');
 
-            let msg = "⚖️ [ 즉결 재판 최종 판결 결과 선포 ]\n\n";
-            if(killedList.length > 0) msg += `💀 CASE OUT (추방): ${killedList.join(', ')}\n`;
-            if(savedList.length > 0) msg += `🌿 SURVIVED (생존): ${savedList.join(', ')}\n`;
-            alert(msg);
-        }
+        let msg = "⚖️ [ 즉결 재판 최종 판결 결과 선포 ]\n\n";
+        if(killedList.length > 0) msg += `💀 CASE OUT (추방): ${killedList.join(', ')}\n`;
+        if(savedList.length > 0) msg += `🌿 SURVIVED (생존): ${savedList.join(', ')}\n`;
+        alert(msg);
+    }
+</script>
     </script>
 </body>
 </html>
