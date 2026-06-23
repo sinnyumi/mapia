@@ -31,6 +31,23 @@
             background-color: rgba(239, 68, 68, 0.15) !important;
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
         }
+
+        /* 🔒 실제 지문(동심원/나선 융선) 패턴 SVG 스타일 */
+        #fingerprint-svg .fp-ridge {
+            fill: none;
+            stroke: #3b5a78;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            transition: stroke .25s ease, filter .25s ease;
+        }
+        #touch-zone.fp-scanning #fingerprint-svg .fp-ridge {
+            stroke: #e0a96d;
+            filter: drop-shadow(0 0 4px rgba(224,169,109,.6));
+        }
+        #touch-zone.fp-success #fingerprint-svg .fp-ridge {
+            stroke: #34d399;
+            filter: drop-shadow(0 0 4px rgba(52,211,153,.6));
+        }
     </style>
 </head>
 <body class="min-h-screen p-3 flex flex-col items-center justify-start max-w-md mx-auto select-none">
@@ -61,15 +78,28 @@
         <div id="step-scanner" class="bg-[#101b2b] border-2 border-[#223956] rounded-3xl p-4 hidden flex-1 flex flex-col items-center justify-between min-h-[80vh] shadow-2xl w-full">
             <div class="text-center pt-2">
                 <h2 class="text-xl font-black text-[#e0a96d] font-orbitron tracking-wider">TARGET TRACKING</h2>
-                <p class="text-xs text-[#adbac7]">정체 식별을 위해 지문 모양을 <span class="text-red-400 font-bold underline">3초간 꾹 누르세요.</span></p>
+                <p class="text-xs text-[#adbac7]">정체 식별을 위해 지문 모양을 <span class="text-red-400 font-bold underline">2.3초간 꾹 누르세요.</span></p>
             </div>
             
             <div id="touch-zone" class="relative w-full flex-1 max-h-[58vh] bg-[#05090f] border-2 border-[#e0a96d]/30 rounded-2xl flex items-center justify-center cursor-pointer select-none overflow-hidden my-4 active:border-[#e0a96d]">
                 <div id="laser" class="absolute left-0 w-full h-1.5 bg-[#e0a96d] shadow-[0_0_20px_#e0a96d] hidden scanner-line z-10"></div>
                 <div id="progress-bar" class="absolute bottom-0 left-0 w-full bg-[#e0a96d]/15 transition-all duration-75" style="height: 0%;"></div>
-                
-                <svg class="w-full h-full max-w-[280px] max-h-[340px] text-[#e0a96d] p-4 transition-transform duration-300" viewBox="0 0 512 512" fill="currentColor">
-                    <path d="M256,16c-38.3,0-74,13.6-101.9,38c-5.8,5.1-6.4,13.9-1.3,19.7c5.1,5.8,13.9,6.4,19.7,1.3c22.5-19.7,51.3-31,83.4-31 c67.6,0,122.7,55.1,122.7,122.7c0,16.8-3.4,33.1-10.1,48.4c-4.9,11.1,0.1,23.9,11.2,28.8c11.1,4.9,23.9-0.1,28.8-11.2 c9.2-20.9,13.9-43.2,13.9-66C422.7,91.8,347.9,16,256,16z M256,77.3c-21.5,0-41.5,7.6-57.2,21.3c-5.9,5.1-6.7,13.9-1.6,19.8 c5.1,5.9,13.9,6.7,19.8,1.6c9.9-8.6,22.5-13.4,36-13.4c52.2,0,94.7,42.5,94.7,94.7c0,23.1-8.3,44.9-23.4,61.5 c-7.8,8.6-7.1,21.9,1.5,29.7c8.6,7.8,21.9,7.1,29.7-1.5c22.8-25.1,35.3-58,35.3-92.7C390.7,137.7,330.3,77.3,256,77.3z M256,138.7 c-4.6,0-9,0.4-13.4,1.1c-11.9,2.1-19.8,13.4-17.7,25.3c2.1,11.9,13.4,19.8,25.3,17.7c2-.3,3.9-0.4,5.8-0.4c36.8,0,66.7,29.9,66.7,66.7 c0,15.5-5.3,30.2-14.9,41.4c-7.7,8.9-6.6,22.2,2.3,29.9c8.9,7.7,22.2,6.6,29.9-2.3c15.1-17.5,23.4-40.4,23.4-64.6 C362.7,186.4,314.9,138.7,256,138.7z M207.2,162c-6.1,10.4-2.5,23.8,7.9,29.9c25.4,14.8,40.9,42.3,40.9,71.8c0,46.7-38,84.7-84.7,84.7 c-27.1,0-52.1-12.7-68-34.6c-7.1,9.7-15.6,18.1-25.3,25c21.8,28.6,56.1,45.6,93.3,45.6c66.6,0,120.7-54.1,120.7-120.7 c0-41.9-22-81.1-58.1-102.1C223.1,155.6,209.6,155.9,207.2,162z M157.3,194.7c-11.3,4.3-17,17.1-12.7,28.4c1.1,2.8,2.8,5.4,5.1,7.4 c10.3,9.1,16.3,22.1,16.3,36c0,27-21.9,48.9-48.9,48.9c-11.7,0-22.9-4.2-31.8-11.7c-9.2-7.8-22.5-6.6-30.3,2.7 c-7.8,9.2-6.6,22.5,2.7,30.3c16.3,13.8,37.1,21.4,59.3,21.4c48.8,0,88.5-39.7,88.5-88.5c0-24.8-10.9-48-29.8-63.7 C178,199.6,166.7,191.1,157.3,194.7z"/>
+
+                <!-- 🔒 실제 지문처럼 보이는 동심원/나선 융선 패턴 SVG -->
+                <svg id="fingerprint-svg" class="w-full h-full max-w-[280px] max-h-[340px] p-6 transition-transform duration-300" viewBox="0 0 200 200" fill="none">
+                    <path class="fp-ridge" d="M100,18 C55,18 28,52 28,100 C28,140 50,170 78,182"/>
+                    <path class="fp-ridge" d="M100,28 C62,28 38,57 38,100 C38,134 56,160 80,172"/>
+                    <path class="fp-ridge" d="M100,38 C69,38 48,62 48,100 C48,128 62,150 82,162"/>
+                    <path class="fp-ridge" d="M100,48 C76,48 58,67 58,100 C58,122 68,140 84,152"/>
+                    <path class="fp-ridge" d="M100,58 C83,58 68,72 68,100 C68,116 74,130 86,142"/>
+                    <path class="fp-ridge" d="M100,68 C90,68 78,77 78,100 C78,110 81,120 88,132"/>
+                    <path class="fp-ridge" d="M100,78 C97,78 88,82 88,100 C88,104 90,110 91,118"/>
+                    <path class="fp-ridge" d="M112,20 C148,26 172,58 172,100 C172,138 152,166 126,180"/>
+                    <path class="fp-ridge" d="M112,30 C142,35 162,62 162,100 C162,132 146,156 124,170"/>
+                    <path class="fp-ridge" d="M112,40 C136,44 152,67 152,100 C152,126 140,146 122,160"/>
+                    <path class="fp-ridge" d="M112,50 C130,53 142,72 142,100 C142,120 133,136 120,150"/>
+                    <path class="fp-ridge" d="M112,60 C124,63 132,77 132,100 C132,114 126,126 117,138"/>
+                    <path class="fp-ridge" d="M112,72 C118,74 122,82 122,96 C122,106 119,114 113,122"/>
                 </svg>
             </div>
             
@@ -151,7 +181,7 @@
             </p>
             <div class="grid grid-cols-2 gap-2.5 pt-0.5">
                 <button onclick="handleIndividualJudgement('execute')" class="bg-gradient-to-b from-red-800 to-red-600 text-white font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg">💥 처형 (処刑)</button>
-                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救출)</button>
+                <button onclick="handleIndividualJudgement('save')" class="bg-gradient-to-b from-[#1b2b42] to-[#223956] text-[#e0a96d] font-black py-3 rounded-xl text-xs cursor-pointer shadow-lg border border-[#e0a96d]/20">🌿 살리기 (救出)</button>
             </div>
         </div>
     </div>
@@ -235,13 +265,27 @@
             zone.ontouchend = (e) => { e.preventDefault(); stopScan(); };
         }
 
+        // ⏱️ 2.3초(=2300ms) 동안 23단계로 진행 -> 100ms 간격, 회당 약 4.35%
+        const SCAN_DURATION_MS = 2300;
+        const SCAN_STEP_MS = 100;
+        const SCAN_STEP_PERCENT = 100 / (SCAN_DURATION_MS / SCAN_STEP_MS);
+
         function startScan() {
             document.getElementById('laser').classList.remove('hidden');
+            document.getElementById('touch-zone').classList.add('fp-scanning');
             document.getElementById('scan-status').innerText = "알리바이 데이터 코드 스캔 중...";
             scanInterval = setInterval(() => {
-                scanProgress += 5; document.getElementById('progress-bar').style.height = `${scanProgress}%`;
-                if(scanProgress >= 100) { clearInterval(scanInterval); triggerBuildup(); }
-            }, 150);
+                scanProgress += SCAN_STEP_PERCENT;
+                if (scanProgress > 100) scanProgress = 100;
+                document.getElementById('progress-bar').style.height = `${scanProgress}%`;
+                if(scanProgress >= 100) {
+                    clearInterval(scanInterval);
+                    document.getElementById('touch-zone').classList.remove('fp-scanning');
+                    document.getElementById('touch-zone').classList.add('fp-success');
+                    document.getElementById('scan-status').innerText = "✅ 지문 일치! 신원 확인 완료";
+                    triggerBuildup();
+                }
+            }, SCAN_STEP_MS);
         }
 
         function stopScan() {
@@ -249,6 +293,7 @@
                 clearInterval(scanInterval); scanProgress = 0;
                 document.getElementById('progress-bar').style.height = `0%`;
                 document.getElementById('laser').classList.add('hidden');
+                document.getElementById('touch-zone').classList.remove('fp-scanning');
                 document.getElementById('scan-status').innerText = "스캔 실패! 지문을 유지하세요.";
             }
         }
