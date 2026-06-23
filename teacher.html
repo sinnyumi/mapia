@@ -69,10 +69,14 @@
 }
         
 @keyframes pulse-border {
-    0%, 100% { border-color: rgba(239, 68, 68, 0.5); }
-    50% { border-color: rgba(239, 68, 68, 1); }
+    0%, 100% {
+        border-color: rgba(239, 68, 68, 0.5);
+    }
+    50% {
+        border-color: rgba(239, 68, 68, 1);
+    }
 }
-/* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 방지 */
+/* 📸 범인 이미지가 대시보드를 깨뜨리지 않도록 고정 */
 #chart-container img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
